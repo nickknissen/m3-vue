@@ -1011,6 +1011,74 @@ button svg {
   }
 }
 
+/* ---------- List-detail ---------- */
+
+/* MdListDetail with `split`: the list (scrolling on its own), the divider, then the item. Both
+   the list and the divider stay in view below the top bar (--list-detail-top). */
+.list-detail.split {
+  --list-detail-top: calc(var(--navbar-height) + env(safe-area-inset-top));
+  display: grid;
+  /* The divider is as wide as its button, whether the list shows or not. */
+  grid-template-columns: var(--list-width, 340px) 48px minmax(0, 1fr);
+  align-items: start;
+}
+
+.list-detail.split.list-collapsed {
+  grid-template-columns: 0 48px minmax(0, 1fr);
+}
+
+.list-detail.split > .list-detail-list {
+  position: sticky;
+  top: var(--list-detail-top);
+  grid-column: 1;
+  max-height: calc(100dvh - var(--list-detail-top) - 16px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.list-detail.split > .list-detail-item {
+  grid-column: 3;
+  min-width: 0;
+}
+
+.list-detail .pane-divider {
+  position: sticky;
+  top: var(--list-detail-top);
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: calc(100dvh - var(--list-detail-top) - 16px);
+}
+
+.list-detail .pane-handle {
+  position: relative;
+  flex: 1;
+  width: 16px;
+  border-radius: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.list-detail .pane-handle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 48px;
+  border-radius: 2px;
+  background: var(--outline-variant);
+  transform: translate(-50%, -50%);
+}
+
+.list-detail .pane-handle:hover::before,
+.list-detail .pane-handle:focus-visible::before,
+.list-detail .pane-handle:active::before {
+  background: var(--on-surface);
+}
+
 /* ---------- Print ---------- */
 
 @media print {
@@ -1031,11 +1099,14 @@ button svg {
   .tabbar,
   .snackbar,
   .disclosure,
-  .banner {
+  .banner,
+  .list-detail-list,
+  .list-detail .pane-divider {
     display: none;
   }
 
-  .screen {
+  .screen,
+  .list-detail.split {
     display: block;
     max-width: none;
     padding: 0;

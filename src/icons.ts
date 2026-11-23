@@ -1,5 +1,7 @@
 import arrowDropDown from '@material-symbols/svg-400/rounded/arrow_drop_down.svg?raw';
 import check from '@material-symbols/svg-400/rounded/check.svg?raw';
+import leftPanelClose from '@material-symbols/svg-400/rounded/left_panel_close.svg?raw';
+import leftPanelOpen from '@material-symbols/svg-400/rounded/left_panel_open.svg?raw';
 import moreVert from '@material-symbols/svg-400/rounded/more_vert.svg?raw';
 
 /** An icon as MdIcon draws it: the SVG's path markup, outlined and filled. */
@@ -17,6 +19,8 @@ export const icon = (outlined: string, filled = outlined): IconMarkup => [inner(
 export const PACKAGE_ICONS = {
   arrow_drop_down: icon(arrowDropDown),
   check: icon(check),
+  left_panel_close: icon(leftPanelClose),
+  left_panel_open: icon(leftPanelOpen),
   more_vert: icon(moreVert),
 };
 
