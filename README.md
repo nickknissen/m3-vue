@@ -69,8 +69,10 @@ button says "Cancel"; pass `cancel-label` for another language.
 ### List-detail
 
 `MdListDetail` puts a list beside the open item, with a divider to drag (or move with the arrow
-keys) and a button to hide the list. The width is kept in localStorage under `storage-key`.
-Without `split`, only the item shows, so pass whether the window is wide enough:
+keys) and a button to hide the list. The width is kept in localStorage under `storage-key`, or
+in the app's own state with `v-model:pane` (see `ui/listPane` to load and save it). Without
+`split`, only the item shows and the wrappers take no part in the layout, so pass whether the
+window is wide enough:
 
 ```vue
 <MdListDetail :split="large" storage-key="app.activityList" list-label="Recent activities" :width="{ min: 280, max: 600, initial: 420 }">

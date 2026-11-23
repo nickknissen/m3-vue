@@ -1013,8 +1013,15 @@ button svg {
 
 /* ---------- List-detail ---------- */
 
-/* MdListDetail with `split`: the list (scrolling on its own), the divider, then the item. Both
-   the list and the divider stay in view below the top bar (--list-detail-top). */
+/* MdListDetail without `split`: its wrappers take no part in the layout, so the item lays out as
+   a child of whatever holds MdListDetail. */
+.list-detail:not(.split),
+.list-detail:not(.split) > .list-detail-item {
+  display: contents;
+}
+
+/* With `split`: the list (scrolling on its own), the divider, then the item. Both the list and
+   the divider stay in view below the top bar (--list-detail-top). */
 .list-detail.split {
   --list-detail-top: calc(var(--navbar-height) + env(safe-area-inset-top));
   display: grid;

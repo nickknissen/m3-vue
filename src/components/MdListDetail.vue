@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, useId, useTemplateRef, watch } from 'vue';
+import { computed, nextTick, ref, useId, useTemplateRef, watch } from 'vue';
 import { clampListWidth, LIST_WIDTH, listPaneKey, loadListPane, saveListPane, type ListPane, type ListWidth } from '../ui/listPane';
 import MdIcon from './MdIcon.vue';
 
@@ -7,14 +7,15 @@ import MdIcon from './MdIcon.vue';
  * A list beside the open item (list-detail), with a divider between them: drag it (or use the
  * arrow keys, Home and End) to make the list wider or narrower, double-click it for the initial
  * width, and use its button to hide or show the list. The width and whether the list is hidden
- * are kept in localStorage under `storageKey`.
+ * are kept in localStorage under `storageKey`. An app that keeps them itself (to reset them, say)
+ * binds `v-model:pane` instead.
  *
  * Without `split` (smaller windows), only the item shows.
  */
 const props = withDefaults(
   defineProps<{
     split: boolean;
-    storageKey: string;
+    storageKey?: string;
     /** The list's accessible name. */
     listLabel: string;
     width?: ListWidth;
@@ -33,8 +34,18 @@ const storage = (() => {
     return null;
   }
 })();
-const pane = ref<ListPane>(loadListPane(storage, props.storageKey, props.width));
-watch(pane, (p) => saveListPane(storage, props.storageKey, p, props.width));
+const model = defineModel<ListPane>('pane');
+const local = ref<ListPane>(props.storageKey ? loadListPane(storage, props.storageKey, props.width) : { width: props.width.initial, collapsed: false });
+watch(local, (p) => {
+  if (props.storageKey) saveListPane(storage, props.storageKey, p, props.width);
+});
+const pane = computed<ListPane>({
+  get: () => model.value ?? local.value,
+  set: (p) => {
+    local.value = p;
+    model.value = p;
+  },
+});
 
 const toggle = useTemplateRef<HTMLButtonElement>('toggle');
 let resizeStart: { x: number; width: number } | null = null;
