@@ -1,0 +1,1064 @@
+@property --state {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --ripple-r {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ripple-o {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+:root {
+  --primary: light-dark(#1a5fd0, #aec6ff);
+  --on-primary: light-dark(#ffffff, #002e6b);
+  --primary-container: light-dark(#d8e2ff, #00439a);
+  --on-primary-container: light-dark(#001a42, #d8e2ff);
+  --secondary: light-dark(#565e71, #bec6dc);
+  --on-secondary: light-dark(#ffffff, #283141);
+  --secondary-container: light-dark(#dae2f9, #3e4759);
+  --on-secondary-container: light-dark(#131c2b, #dae2f9);
+  --tertiary: light-dark(#705575, #ddbce0);
+  --on-tertiary: light-dark(#ffffff, #3f2844);
+  --tertiary-container: light-dark(#fad8fd, #573e5c);
+  --on-tertiary-container: light-dark(#28132e, #fad8fd);
+  --error: light-dark(#ba1a1a, #ffb4ab);
+  --on-error: light-dark(#ffffff, #690005);
+  --error-container: light-dark(#ffdad6, #93000a);
+  --on-error-container: light-dark(#410002, #ffdad6);
+  --surface: light-dark(#f9f9ff, #111318);
+  --on-surface: light-dark(#1a1b20, #e2e2e9);
+  --on-surface-variant: light-dark(#44474f, #c4c6d0);
+  --surface-container-lowest: light-dark(#ffffff, #0c0e13);
+  --surface-container-low: light-dark(#f3f3fa, #1a1b20);
+  --surface-container: light-dark(#ededf4, #1e1f25);
+  --surface-container-high: light-dark(#e8e7ee, #282a2f);
+  --surface-container-highest: light-dark(#e2e2e9, #33353a);
+  --outline: light-dark(#74777f, #8e9099);
+  --outline-variant: light-dark(#c4c6d0, #44474f);
+  --scrim: rgb(0 0 0 / 0.32);
+
+  --font: 'Roboto Flex Variable', Roboto, system-ui, sans-serif;
+  --headline-small: 400 1.5rem/2rem var(--font);
+  --title-large: 400 1.375rem/1.75rem var(--font);
+  --title-medium: 500 1rem/1.5rem var(--font);
+  --title-small: 500 0.875rem/1.25rem var(--font);
+  --body-large: 400 1rem/1.5rem var(--font);
+  --body-medium: 400 0.875rem/1.25rem var(--font);
+  --body-small: 400 0.75rem/1rem var(--font);
+  --label-large: 500 0.875rem/1.25rem var(--font);
+  --label-medium: 500 0.75rem/1rem var(--font);
+
+  --shape-small: 8px;
+  --shape-medium: 12px;
+  --shape-large: 16px;
+  --shape-extra-large: 28px;
+
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --elevation-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+  --elevation-3: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+  --elevation-4: 0 2px 3px rgb(0 0 0 / 0.3), 0 6px 10px 4px rgb(0 0 0 / 0.15);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --spring-spatial: linear(0, 0.047, 0.156, 0.293, 0.433, 0.564, 0.678, 0.773, 0.848, 0.905, 0.946, 0.975, 0.994, 1.006, 1.012, 1.015, 1.015, 1.014, 1.012, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  --spring-spatial-duration: 420ms;
+  --spring-fast: linear(0, 0.071, 0.236, 0.437, 0.634, 0.802, 0.931, 1.018, 1.07, 1.092, 1.093, 1.082, 1.064, 1.045, 1.028, 1.013, 1.003, 0.996, 0.992, 0.991, 0.991, 0.993, 0.995, 0.996, 1);
+  --spring-fast-duration: 350ms;
+  --duration-short: 150ms;
+  --duration-medium: 300ms;
+
+  --navbar-height: 64px;
+  --hit-outset: 0px;
+  font: var(--body-large);
+  letter-spacing: 0.01em;
+  color: var(--on-surface);
+  background: var(--surface);
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --hit-outset: -4px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  /* Pan only, like a native app: no pinch or double-tap zoom. Not inherited, so it's set on everything. */
+  touch-action: pan-x pan-y;
+}
+
+/* The page never scrolls sideways; the wide review table scrolls inside its own container. `clip` keeps sticky. */
+html,
+body {
+  margin: 0;
+  background: var(--surface);
+  overscroll-behavior-y: none;
+  overflow-x: clip;
+}
+
+/* A long press selects nothing and opens no link or image preview, like a native app. Inherited, so set once here. */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* iOS won't let you type into a field that inherits `user-select: none`. The OCR text stays copyable. */
+input,
+textarea,
+[contenteditable],
+pre {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+svg {
+  fill: currentColor;
+}
+
+/* ---------- App shell ---------- */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: calc(var(--navbar-height) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) max(4px, env(safe-area-inset-right)) 0 max(4px, env(safe-area-inset-left));
+  background: var(--surface);
+  transition: background-color var(--duration-medium) var(--ease-standard);
+}
+
+.navbar-scrolled {
+  background: var(--surface-container);
+}
+
+.navbar-side {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.navbar-side:empty {
+  width: 12px;
+}
+
+.navbar-title {
+  margin: 0;
+  font: var(--title-large);
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-button {
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--on-surface);
+}
+
+.nav-action {
+  position: relative;
+  min-height: 40px;
+  margin-right: 8px;
+  padding: 0 16px;
+}
+
+.nav-action::after {
+  content: '';
+  position: absolute;
+  inset: var(--hit-outset);
+}
+
+.nav-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.screen {
+  flex: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+/* ---------- Screen transitions ---------- */
+
+.fade-through-leave-active {
+  transition: opacity 90ms var(--ease-emphasized-accelerate);
+}
+
+.fade-through-enter-active {
+  transition:
+    opacity 210ms var(--ease-emphasized-decelerate),
+    transform 210ms var(--ease-emphasized-decelerate);
+}
+
+.fade-through-leave-to {
+  opacity: 0;
+}
+
+.fade-through-enter-from {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.axis-forward-leave-active,
+.axis-back-leave-active {
+  transition:
+    opacity 100ms var(--ease-emphasized-accelerate),
+    transform 100ms var(--ease-emphasized-accelerate);
+}
+
+.axis-forward-enter-active,
+.axis-back-enter-active {
+  transition:
+    opacity 250ms var(--ease-emphasized-decelerate),
+    transform var(--spring-spatial-duration) var(--spring-spatial);
+}
+
+.axis-forward-leave-to,
+.axis-back-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.axis-forward-enter-from,
+.axis-back-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-through-enter-from,
+  .axis-forward-leave-to,
+  .axis-forward-enter-from,
+  .axis-back-leave-to,
+  .axis-back-enter-from {
+    transform: none;
+  }
+}
+
+/* ---------- Buttons and state layers ---------- */
+
+button,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: none;
+  background-color: transparent;
+  color: var(--primary);
+  font: var(--label-large);
+  letter-spacing: 0.00625rem;
+  cursor: pointer;
+}
+
+button,
+.tappable {
+  --rx: 50%;
+  --ry: 50%;
+  background-image:
+    radial-gradient(
+      circle at var(--rx) var(--ry),
+      color-mix(in srgb, currentColor var(--ripple-o), transparent) calc(var(--ripple-r) * 0.7),
+      transparent var(--ripple-r)
+    ),
+    linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
+  transition:
+    --state var(--duration-short) linear,
+    background-color var(--duration-short) var(--ease-standard),
+    color var(--duration-short) var(--ease-standard),
+    box-shadow var(--duration-short) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  button:hover:not(:disabled),
+  .tappable:hover {
+    --state: 8%;
+  }
+}
+
+button:focus-visible,
+.tappable:focus-visible,
+button:active:not(:disabled),
+.tappable:active {
+  --state: 10%;
+}
+
+.rippling {
+  animation: ripple 600ms var(--ease-standard);
+}
+
+@keyframes ripple {
+  from {
+    --ripple-r: 0px;
+    --ripple-o: 12%;
+  }
+  60% {
+    --ripple-o: 12%;
+  }
+  to {
+    --ripple-r: var(--ripple-max, 200px);
+    --ripple-o: 0%;
+  }
+}
+
+button:disabled {
+  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+  cursor: not-allowed;
+}
+
+.primary:disabled,
+.tonal:disabled {
+  background-color: color-mix(in srgb, var(--on-surface) 12%, transparent);
+}
+
+button svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+.primary {
+  background-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.tonal {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.primary,
+.tonal,
+.dialog-actions button,
+.snackbar-action {
+  position: relative;
+}
+
+.primary::after,
+.tonal::after,
+.dialog-actions button::after,
+.snackbar-action::after {
+  content: '';
+  position: absolute;
+  inset: var(--hit-outset);
+}
+
+.large {
+  min-height: 56px;
+  font: var(--title-medium);
+}
+
+.large svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- Grouped lists ---------- */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 24px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.group > * {
+  border-radius: 4px;
+  background-color: var(--surface-container);
+}
+
+.group-header {
+  margin: 0 0 8px;
+  padding: 0 4px;
+  font: var(--title-small);
+  color: var(--primary);
+}
+
+.group-row {
+  --tone: var(--primary-container);
+  --on-tone: var(--on-primary-container);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  padding: 8px 16px;
+  color: var(--on-surface);
+  font: var(--body-large);
+  text-align: left;
+  list-style: none;
+}
+
+.group-row:nth-child(3n + 2) {
+  --tone: var(--secondary-container);
+  --on-tone: var(--on-secondary-container);
+}
+
+.group-row:nth-child(3n + 3) {
+  --tone: var(--tertiary-container);
+  --on-tone: var(--on-tertiary-container);
+}
+
+.group-row.tappable {
+  cursor: pointer;
+}
+
+.row-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  padding: 8px;
+  border-radius: 50%;
+  background: var(--tone);
+  color: var(--on-tone);
+}
+
+.row-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-value {
+  flex: none;
+  max-width: 60%;
+  min-height: 48px;
+  padding: 0 12px;
+  text-align: right;
+}
+
+.group-row.stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-block: 12px;
+}
+
+.row-notes {
+  padding: 12px;
+  resize: vertical;
+}
+
+.chevron {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  color: var(--on-surface-variant);
+}
+
+/* ---------- Banners ---------- */
+
+.banner {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: var(--shape-large);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font: var(--body-medium);
+}
+
+.banner-error {
+  background: var(--error-container);
+  color: var(--on-error-container);
+}
+
+.banner-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.banner-action p {
+  flex: 1 1 16em;
+  margin: 0;
+}
+
+/* ---------- Snackbar ---------- */
+
+.snackbar {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 4px 8px 4px 16px;
+  border-radius: var(--shape-small);
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+  font: var(--body-medium);
+  box-shadow: var(--elevation-3);
+}
+
+/* 16px above whatever sits below: the screen edge or the 80px tab bar. */
+
+.shell-tabbed .snackbar {
+  bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+.snackbar-text {
+  flex: 1;
+  padding: 10px 0;
+}
+
+.snackbar-action {
+  flex: none;
+  padding: 0 12px;
+}
+
+.snackbar-enter-active,
+.snackbar-leave-active {
+  transition:
+    opacity var(--duration-short) var(--ease-standard),
+    transform var(--duration-short) var(--ease-standard);
+}
+
+.snackbar-enter-from,
+.snackbar-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+/* ---------- Dropdown menu ---------- */
+
+.select-trigger {
+  flex: none;
+  max-width: 60%;
+  min-height: 48px;
+  gap: 4px;
+  padding: 0 4px 0 12px;
+  border-bottom: 1px solid var(--on-surface-variant);
+  border-radius: 4px 4px 0 0;
+  background-color: var(--surface-container-highest);
+  color: var(--on-surface);
+  font: var(--body-large);
+  letter-spacing: 0.01em;
+}
+
+.select-trigger:focus-visible,
+.select-trigger[aria-expanded='true'] {
+  outline: none;
+  border-bottom: 2px solid var(--primary);
+}
+
+.select-trigger .select-arrow {
+  width: 24px;
+  height: 24px;
+  color: var(--on-surface-variant);
+  transition: transform var(--duration-medium) var(--ease-standard);
+}
+
+.select-trigger[aria-expanded='true'] .select-arrow {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: fixed;
+  inset: auto;
+  min-width: 112px;
+  max-width: 280px;
+  margin: 0;
+  padding: 4px;
+  border: none;
+  border-radius: var(--shape-large);
+  background: var(--surface-container);
+  color: var(--on-surface);
+  box-shadow: var(--elevation-2);
+  opacity: 0;
+  transform: scaleY(0.6);
+  transition:
+    opacity var(--duration-short) var(--ease-standard),
+    transform var(--duration-short) var(--ease-emphasized-accelerate),
+    overlay var(--duration-short) allow-discrete,
+    display var(--duration-short) allow-discrete;
+}
+
+.menu:popover-open {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-short) var(--ease-standard),
+    transform var(--spring-spatial-duration) var(--spring-spatial),
+    overlay var(--spring-spatial-duration) allow-discrete,
+    display var(--spring-spatial-duration) allow-discrete;
+}
+
+@starting-style {
+  .menu:popover-open {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+}
+
+.menu-item {
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: var(--shape-medium);
+  color: var(--on-surface);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.menu-item:focus-visible {
+  outline-offset: -3px;
+}
+
+.menu-item + .menu-item {
+  margin-top: 2px;
+}
+
+.menu-item[aria-selected='true'] {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.menu-item .menu-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--on-surface-variant);
+}
+
+.menu-item .menu-check {
+  width: 20px;
+  height: 20px;
+  visibility: hidden;
+}
+
+.menu-item[aria-selected='true'] .menu-check {
+  visibility: visible;
+}
+
+/* ---------- Dialog ---------- */
+
+.dialog {
+  width: min(560px, calc(100vw - 48px));
+  min-width: 280px;
+  padding: 0;
+  border: none;
+  border-radius: var(--shape-extra-large);
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  opacity: 0;
+  transform: translateY(-24px) scale(0.96);
+  transition:
+    opacity var(--duration-short) var(--ease-emphasized-accelerate),
+    transform var(--duration-short) var(--ease-emphasized-accelerate),
+    overlay var(--duration-short) allow-discrete,
+    display var(--duration-short) allow-discrete;
+}
+
+.dialog:focus-visible {
+  outline: none;
+}
+
+.dialog[open] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--duration-medium) var(--ease-emphasized-decelerate),
+    transform var(--spring-spatial-duration) var(--spring-spatial),
+    overlay var(--spring-spatial-duration) allow-discrete,
+    display var(--spring-spatial-duration) allow-discrete;
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.96);
+  }
+}
+
+.dialog::backdrop {
+  background: transparent;
+  transition:
+    background-color var(--duration-medium) var(--ease-standard),
+    overlay var(--duration-medium) allow-discrete,
+    display var(--duration-medium) allow-discrete;
+}
+
+.dialog[open]::backdrop {
+  background: var(--scrim);
+}
+
+@starting-style {
+  .dialog[open]::backdrop {
+    background: transparent;
+  }
+}
+
+.dialog-content {
+  padding: 24px;
+}
+
+.dialog-title {
+  margin: 0 0 16px;
+  font: var(--headline-small);
+  letter-spacing: 0;
+}
+
+.dialog-body {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font: var(--body-medium);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.dialog-actions button {
+  padding: 0 12px;
+}
+
+.field-error {
+  margin: -16px 4px 24px;
+  color: var(--error);
+  font: var(--body-small);
+}
+
+/* ---------- Disclosure ---------- */
+
+.disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosure {
+  interpolate-size: allow-keywords;
+}
+
+.disclosure::details-content {
+  height: 0;
+  overflow: clip;
+  transition:
+    height var(--duration-medium) var(--ease-standard),
+    content-visibility var(--duration-medium) allow-discrete;
+}
+
+.disclosure[open]::details-content {
+  height: auto;
+}
+
+.disclosure .chevron {
+  transition: transform var(--duration-medium) var(--ease-standard);
+}
+
+.disclosure[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.disclosure-body {
+  padding: 4px 16px 16px;
+  color: var(--on-surface-variant);
+}
+
+.disclosure-body pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font: 400 0.75rem/1rem ui-monospace, monospace;
+}
+
+/* ---------- Navigation bar ---------- */
+
+.shell-tabbed .screen {
+  padding-bottom: calc(168px + env(safe-area-inset-bottom));
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: var(--surface-container);
+}
+
+.tab {
+  flex: 1;
+  max-width: 168px;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 80px;
+  padding: 12px 0 16px;
+  border-radius: 0;
+  background-image: none;
+  color: var(--on-surface-variant);
+  font: var(--label-medium);
+}
+
+.tab-indicator {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 32px;
+  border-radius: 16px;
+  background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
+  transition: --state var(--duration-short) linear;
+}
+
+.tab-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--secondary-container);
+  opacity: 0;
+  transform: scaleX(0.3);
+  transition:
+    transform var(--spring-fast-duration) var(--spring-fast),
+    opacity var(--duration-short) var(--ease-standard);
+}
+
+.tab[aria-current='page'] .tab-indicator::before {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: hover) {
+  .tab:hover .tab-indicator {
+    --state: 8%;
+  }
+}
+
+.tab:active .tab-indicator,
+.tab:focus-visible .tab-indicator {
+  --state: 10%;
+}
+
+.tab svg {
+  width: 24px;
+  height: 24px;
+}
+
+.tab[aria-current='page'] {
+  color: var(--on-surface);
+}
+
+.tab[aria-current='page'] .tab-indicator {
+  color: var(--on-secondary-container);
+}
+
+/* ---------- Wider screens ---------- */
+
+@media (min-width: 600px) {
+  .shell-tabbed {
+    padding-left: calc(80px + env(safe-area-inset-left));
+  }
+
+  .shell-tabbed .screen {
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+  }
+
+  .tabbar {
+    top: 0;
+    right: auto;
+    width: calc(80px + env(safe-area-inset-left));
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: calc(var(--navbar-height) + 24px + env(safe-area-inset-top)) 0 0 env(safe-area-inset-left);
+  }
+
+  .tab {
+    flex: none;
+    min-height: 56px;
+    padding: 0;
+  }
+
+  .tab-indicator {
+    width: 56px;
+  }
+
+  /* The tab bar is a rail on the left, so nothing is below. */
+  .shell-tabbed .snackbar {
+    left: calc(96px + env(safe-area-inset-left));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 720px) {
+  .screen {
+    padding-top: 32px;
+  }
+}
+
+@media (min-width: 840px) {
+  /* Content starts beside the rail, in line with the app bar title, instead of floating in the middle. */
+  .screen {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .shell-tabbed {
+    padding-left: calc(240px + env(safe-area-inset-left));
+  }
+
+  .tabbar {
+    width: calc(240px + env(safe-area-inset-left));
+    align-items: stretch;
+    gap: 0;
+    padding: calc(var(--navbar-height) + 40px + env(safe-area-inset-top)) 12px 0 calc(12px + env(safe-area-inset-left));
+  }
+
+  .tab {
+    position: relative;
+    isolation: isolate;
+    max-width: none;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 0 16px;
+    border-radius: 28px;
+    background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
+    font: var(--label-large);
+    transition: --state var(--duration-short) linear;
+  }
+
+  .tab-indicator {
+    position: static;
+    isolation: auto;
+    width: 24px;
+    height: 24px;
+    background-image: none;
+  }
+
+  .tab-indicator::before {
+    border-radius: 28px;
+  }
+
+  .tab[aria-current='page'] {
+    color: var(--on-secondary-container);
+  }
+
+  .tab:active,
+  .tab:focus-visible {
+    --state: 10%;
+  }
+}
+
+@media (min-width: 1200px) and (hover: hover) {
+  .tab:hover {
+    --state: 8%;
+  }
+}
+
+/* ---------- Print ---------- */
+
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  .shell-tabbed {
+    padding-left: 0;
+  }
+
+  .navbar {
+    position: static;
+    background: none;
+  }
+
+  .navbar-side,
+  .tabbar,
+  .snackbar,
+  .disclosure,
+  .banner {
+    display: none;
+  }
+
+  .screen {
+    display: block;
+    max-width: none;
+    padding: 0;
+  }
+
+  .group > *,
+  input,
+  .select-trigger {
+    background: none;
+    box-shadow: none;
+  }
+
+  input,
+  .select-trigger {
+    border: none;
+  }
+
+  .select-arrow {
+    display: none;
+  }
+
+  .group,
+  table {
+    break-inside: avoid;
+  }
+}

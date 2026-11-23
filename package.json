@@ -1,0 +1,38 @@
+{
+  "name": "m3-vue",
+  "version": "0.1.0",
+  "description": "Material 3 styles, components and helpers shared by ErgScan and garmin-dashboard",
+  "license": "MIT",
+  "type": "module",
+  "repository": "github:nickknissen/m3-vue",
+  "files": [
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "exports": {
+    "./style.css": "./src/style.css",
+    "./icons": "./src/icons.ts",
+    "./ui/*": "./src/ui/*.ts",
+    "./components/*": "./src/components/*"
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "check": "vue-tsc --noEmit && vitest run"
+  },
+  "peerDependencies": {
+    "@material-symbols/svg-400": ">=0.49.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@material-symbols/svg-400": "^0.49.0",
+    "@types/node": "^24.19.2",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vue/tsconfig": "^0.9.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1",
+    "vue": "^3.5.46",
+    "vue-tsc": "^3.3.14"
+  }
+}
