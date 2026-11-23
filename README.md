@@ -7,8 +7,8 @@ and were copied into garmin-dashboard. This package replaces both copies.
 - `m3-vue/style.css`: tokens (light and dark), the app shell, screen transitions, buttons and
   state layers, grouped lists, banners, snackbar, dropdown menu, dialog, disclosure, navigation
   bar and rail, wider screens, print
-- `m3-vue/components/MdIcon.vue`, `MdDialog.vue`, `MdMenu.vue`, `MdSelect.vue`, `MdListDetail.vue`
-- `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`
+- `m3-vue/components/MdIcon.vue`, `MdDialog.vue`, `MdMenu.vue`, `MdSelect.vue`, `MdListDetail.vue`, `MdSnackbar.vue`
+- `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`, `snackbar`
 - `m3-vue/icons`: the icon registry `MdIcon` draws from
 
 ## Using it
@@ -79,6 +79,19 @@ window is wide enough:
   <template #list><ActivityList /></template>
   <ActivityDetail />
 </MdListDetail>
+```
+
+### Snackbar
+
+Mount `MdSnackbar` once in the app shell, then call `snackbar()` (`m3-vue/ui/snackbar`) from
+anywhere. A new snackbar replaces the one showing. It stays 5 s, or 8 s with an action, and
+waits while the pointer or focus is on it. The promise says how it ended: `'action'`,
+`'timeout'` or `'replaced'`.
+
+```ts
+if ((await snackbar('Step deleted', { action: 'Undo' })) === 'action') restore();
+// Stays until Reload is tapped (or another snackbar replaces it):
+void snackbar('Update available', { action: 'Reload', duration: Infinity }).then((how) => how === 'action' && reload());
 ```
 
 ## Changing it
