@@ -43,6 +43,9 @@
   --surface-container-highest: light-dark(#e2e2e9, #33353a);
   --outline: light-dark(#74777f, #8e9099);
   --outline-variant: light-dark(#c4c6d0, #44474f);
+  --inverse-surface: light-dark(#2f3036, #e2e2e9);
+  --inverse-on-surface: light-dark(#f1f0f7, #2f3036);
+  --inverse-primary: light-dark(#aec6ff, #1a5fd0);
   --scrim: rgb(0 0 0 / 0.32);
 
   --font: 'Roboto Flex Variable', Roboto, system-ui, sans-serif;
@@ -496,6 +499,91 @@ button svg {
   height: 24px;
   flex: none;
   color: var(--on-surface-variant);
+}
+
+/* ---------- Segmented button ---------- */
+
+/* Links (aria-current on the chosen one) or radio buttons (role="radio", aria-checked). */
+.segmented {
+  display: inline-flex;
+  flex: none;
+  overflow: hidden;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+}
+
+.segmented > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-right: 1px solid var(--outline);
+  border-radius: 0;
+  color: var(--on-surface);
+  font: var(--label-large);
+  letter-spacing: 0.00625rem;
+  text-decoration: none;
+}
+
+.segmented > :last-child {
+  border-right: 0;
+}
+
+.segmented > [aria-current],
+.segmented > [aria-checked='true'] {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.segmented svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Colour swatches ---------- */
+
+/* Radio buttons, each a circle split into --swatch-1/2/3 (see accentSwatch in ui/palette). */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swatch {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-height: 0;
+  padding: 0;
+  color: var(--on-surface);
+}
+
+.swatch::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background:
+    linear-gradient(var(--swatch-1) 50%, transparent 50%),
+    linear-gradient(90deg, var(--swatch-2) 50%, var(--swatch-3) 50%);
+  transition: inset var(--duration-short) var(--ease-standard);
+}
+
+.swatch[aria-checked='true']::before {
+  inset: 8px;
+  outline: 2px solid var(--on-surface);
+  outline-offset: 2px;
+}
+
+.swatch svg {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 50%;
+  background: var(--surface);
 }
 
 /* ---------- Banners ---------- */

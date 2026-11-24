@@ -5,10 +5,10 @@ Material 3 styles, components and helpers for Vue 3, shared by
 and were copied into garmin-dashboard. This package replaces both copies.
 
 - `m3-vue/style.css`: tokens (light and dark), the app shell, screen transitions, buttons and
-  state layers, grouped lists, banners, snackbar, dropdown menu, dialog, disclosure, navigation
-  bar and rail, wider screens, print
+  state layers, grouped lists, segmented buttons, colour swatches, banners, snackbar, dropdown
+  menu, dialog, disclosure, navigation bar and rail, wider screens, print
 - `m3-vue/components/MdIcon.vue`, `MdDialog.vue`, `MdMenu.vue`, `MdSelect.vue`, `MdListDetail.vue`, `MdSnackbar.vue`
-- `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`, `snackbar`
+- `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`, `snackbar`, `theme`, `palette`
 - `m3-vue/icons`: the icon registry `MdIcon` draws from
 
 ## Using it
@@ -20,11 +20,13 @@ Install a tag:
 npm install github:nickknissen/m3-vue#v0.1.0
 ```
 
-In `vite.config.ts`, keep Vite from pre-bundling it, and let vitest compile it:
+In `vite.config.ts`, keep Vite from pre-bundling it, and let vitest compile it. Its colour
+library, `@material/material-color-utilities`, imports without file extensions, which Node
+won't load, so vitest compiles that too:
 
 ```ts
 optimizeDeps: { exclude: ['m3-vue'] },
-test: { server: { deps: { inline: ['m3-vue'] } } },
+test: { server: { deps: { inline: ['@material/material-color-utilities', 'm3-vue'] } } },
 ```
 
 Import the styles before the app's own, so the app's rules win:
@@ -93,6 +95,30 @@ if ((await snackbar('Step deleted', { action: 'Undo' })) === 'action') restore()
 // Stays until Reload is tapped (or another snackbar replaces it):
 void snackbar('Update available', { action: 'Reload', duration: Infinity }).then((how) => how === 'action' && reload());
 ```
+
+### Theme and accent colour
+
+`m3-vue/ui/theme` keeps the light/dark choice (`system`, `light`, `dark`) and an accent colour
+in storage under the app's keys, and `applyTheme` puts them on the page: `data-theme` on the
+root, which style.css follows, and the colour tokens from a palette that `m3-vue/ui/palette`
+generates from the accent's seed (Material 3 tonal spot), or style.css's own for `default`.
+It also sets each `<meta name="theme-color">` to the matching surface. Apply the saved choice
+before mounting, so the first paint is right:
+
+```ts
+import { applyTheme, loadAccent, loadTheme } from 'm3-vue/ui/theme';
+
+try {
+  applyTheme(document, loadTheme(localStorage, 'app.theme'), loadAccent(localStorage, 'app.accent'));
+} catch {
+  applyTheme(document, 'system');
+}
+```
+
+For the settings, `.segmented` with `role="radio"` buttons picks the theme, and `.swatches`
+with `.swatch` radio buttons the accent; give each swatch `accentSwatch(accent)` as
+`--swatch-1`, `--swatch-2` and `--swatch-3`. `handleRadioKeydown` (`m3-vue/ui/keyboardNav`)
+moves between the options with the arrow keys.
 
 ## Changing it
 
