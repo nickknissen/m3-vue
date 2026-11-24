@@ -4,5 +4,5 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [vue()],
-  test: { environment: 'node' },
+  test: { environment: 'node', server: { deps: { inline: ['@material/material-color-utilities'] } } },
 });
