@@ -1,6 +1,6 @@
-import { ACCENTS, accentPalette, paletteProperties, TOKEN_PROPERTIES, type Accent } from './palette';
+import { ACCENTS, accentPalette, harmonizedColors, paletteProperties, TOKEN_PROPERTIES, type Accent, type CustomColor } from './palette';
 
-export type { Accent };
+export type { Accent, CustomColor };
 
 /** Light or dark: follow the system, or pin one. */
 export type Theme = 'system' | 'light' | 'dark';
@@ -44,8 +44,10 @@ export function saveAccent(storage: Pick<Storage, 'setItem' | 'removeItem'>, key
  * Picks the scheme with `data-theme` on the root (style.css follows it, including the light-dark()
  * a build lowers), sets the colour tokens from the accent's generated palette, or back to
  * style.css's for the default, and sets each `theme-color` meta to the matching surface.
+ * `colors`, the app's own colours keyed by custom property, are set on the root too, harmonized
+ * with the accent (see harmonizedColors): pass the same ones on every call.
  */
-export function applyTheme(doc: Document, theme: Theme, accent: Accent = 'default'): void {
+export function applyTheme(doc: Document, theme: Theme, accent: Accent = 'default', colors: Readonly<Record<string, CustomColor>> = {}): void {
   const root = doc.documentElement;
   const style = root.style;
   const palette = accentPalette(accent);
@@ -53,6 +55,7 @@ export function applyTheme(doc: Document, theme: Theme, accent: Accent = 'defaul
   else root.dataset.theme = theme;
   for (const property of TOKEN_PROPERTIES) style.removeProperty(property);
   if (palette) for (const [property, value] of paletteProperties(palette)) style.setProperty(property, value);
+  for (const [property, c] of Object.entries(harmonizedColors(accent, colors))) style.setProperty(property, `light-dark(${c.light}, ${c.dark})`);
   for (const meta of doc.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
     const scheme = theme === 'system' ? (meta.media.includes('dark') ? 'dark' : 'light') : theme;
     meta.content = palette ? palette[scheme].surface : SURFACE[scheme];
