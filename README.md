@@ -4,9 +4,10 @@ Material 3 styles, components and helpers for Vue 3, shared by
 [ErgScan](https://github.com/nickknissen/ergscan) and garmin-dashboard. They started in ErgScan
 and were copied into garmin-dashboard. This package replaces both copies.
 
-- `m3-vue/style.css`: tokens (light and dark), the app shell, screen transitions, buttons and
-  state layers, grouped lists, segmented buttons, colour swatches, banners, snackbar, dropdown
-  menu, dialog, disclosure, navigation bar and rail, wider screens, print
+- `m3-vue/style.css`: tokens (light and dark, with a `-tracking` token per type role), the app
+  shell, screen transitions, buttons and state layers, grouped lists, segmented buttons, colour
+  swatches, banners, snackbar, dropdown menu, dialog, disclosure, small text button, filled text
+  field, checkbox, loading bar, navigation bar and rail, wider screens, print
 - `m3-vue/components/MdIcon.vue`, `MdDialog.vue`, `MdMenu.vue`, `MdSelect.vue`, `MdListDetail.vue`, `MdSnackbar.vue`
 - `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`, `snackbar`, `theme`, `palette`
 - `m3-vue/icons`: the icon registry `MdIcon` draws from
@@ -119,6 +120,34 @@ For the settings, `.segmented` with `role="radio"` buttons picks the theme, and 
 with `.swatch` radio buttons the accent; give each swatch `accentSwatch(accent)` as
 `--swatch-1`, `--swatch-2` and `--swatch-3`. `handleRadioKeydown` (`m3-vue/ui/keyboardNav`)
 moves between the options with the arrow keys.
+
+### Buttons
+
+A bare `<button>` (or `class="button"` on a link) is a text button; `.primary` is filled and
+`.tonal` filled tonal. An icon before the label gets the M3 padding by itself. An icon after the
+label needs `.icon-end`, since CSS can't see the order:
+
+```html
+<button type="button"><MdIcon name="refresh" />Try again</button>
+<a class="button tonal icon-end" href="/older">Older<MdIcon name="chevron_right" /></a>
+```
+
+Every button reaches 48dp on a touch screen through an `::after` (`--hit-outset`), so a
+component that needs its button's `::after` for something else should override `inset`, or use
+`::before`. `.compact` is a 32dp text button with a 48dp target.
+
+### Text field
+
+```html
+<label class="field floating">
+  <span class="field-label">Email</span>
+  <input type="email" placeholder=" " />
+</label>
+```
+
+Without `floating`, the label is plain text that stays small above the value
+(`<label class="field">Email <input /></label>`). `.dense` makes a 48dp field for rows of
+fields. Put supporting text under it with `.field-wrap` and `.field-support`.
 
 ## Changing it
 
