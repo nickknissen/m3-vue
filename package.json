@@ -18,7 +18,8 @@
   "scripts": {
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
-    "check": "vue-tsc --noEmit && vitest run"
+    "check": "vue-tsc --noEmit && vitest run",
+    "loading-indicator": "node scripts/loadingIndicator.ts"
   },
   "peerDependencies": {
     "@material-symbols/svg-400": ">=0.49.0",

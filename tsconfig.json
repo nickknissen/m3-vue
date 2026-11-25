@@ -8,5 +8,5 @@
     "noUncheckedIndexedAccess": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "vite.config.ts"]
+  "include": ["src/**/*.ts", "src/**/*.vue", "scripts/**/*.ts", "vite.config.ts"]
 }

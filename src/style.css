@@ -100,6 +100,9 @@
   --duration-medium: 300ms;
 
   --navbar-height: 64px;
+  /* The nav bar at the bottom of a phone (M3 Expressive's flexible nav bar, shorter than the
+     baseline's 80dp). Anything docked above it sits this far up. */
+  --tabbar-height: 64px;
   --hit-outset: 0px;
   font: var(--body-large);
   letter-spacing: 0.01em;
@@ -213,7 +216,8 @@ svg {
   width: 48px;
   min-height: 48px;
   padding: 0;
-  border-radius: var(--shape-full);
+  /* Half its height, not --shape-full, so a press can morph it (see Buttons). */
+  border-radius: var(--button-shape, 24px);
   color: var(--on-surface);
 }
 
@@ -309,9 +313,12 @@ button,
   justify-content: center;
   gap: 8px;
   min-height: 40px;
-  /* A text button's 12dp; filled and tonal ones take 24dp (below). */
+  /* A text button's 12dp; filled and tonal ones take 16dp (below). */
   padding: 0 12px;
-  border-radius: var(--shape-full);
+  /* Round: half the 40dp height. A pixel value rather than --shape-full, because a 9999px
+     radius only starts to look square in the last moment of a transition, so a press couldn't
+     morph it. A press sets --button-shape (below). */
+  border-radius: var(--button-shape, 20px);
   border: none;
   background-color: transparent;
   color: var(--primary);
@@ -335,7 +342,8 @@ button,
     --state var(--duration-short) linear,
     background-color var(--duration-short) var(--ease-standard),
     color var(--duration-short) var(--ease-standard),
-    box-shadow var(--duration-short) var(--ease-standard);
+    box-shadow var(--duration-short) var(--ease-standard),
+    border-radius var(--spring-fast-duration) var(--spring-fast);
 }
 
 @media (hover: hover) {
@@ -350,6 +358,13 @@ button:focus-visible,
 button:active:not(:disabled),
 .tappable:active {
   --state: 10%;
+}
+
+/* Pressed, a button squares off and springs back on release (M3 Expressive's shape morph): 8dp
+   corners at 40dp, 12dp on a .large one. Only a button whose own radius reads --button-shape
+   changes; tabs, menu items and list rows set theirs, and stay as they are. */
+:is(button, .button):active:not(:disabled) {
+  --button-shape: var(--button-pressed-shape, var(--shape-small));
 }
 
 .rippling {
@@ -380,9 +395,10 @@ button:disabled {
   background-color: color-mix(in srgb, var(--on-surface) 12%, transparent);
 }
 
+/* 20dp beside a label (M3 Expressive's small button). */
 button svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex: none;
 }
 
@@ -401,14 +417,16 @@ button svg {
   color: var(--on-secondary-container);
 }
 
+/* 16dp each side, with or without an icon: M3 Expressive's small button (the baseline's 24dp is
+   no longer recommended). */
 .primary,
 .tonal {
-  padding: 0 24px;
+  padding: 0 16px;
 }
 
-/* An icon beside the label: 16dp on the icon's side for a text button, and on the other side for
-   a filled or tonal one (M3). CSS can't see that the icon comes after the label, so a button
-   with a trailing icon says so with .icon-end. The :where()s keep each rule at the specificity
+/* An icon beside the label: 12dp on the icon's side for a text button, 16dp on the other, and
+   16dp both sides for a filled or tonal one. CSS can't see that the icon comes after the label,
+   so a button with a trailing icon says so with .icon-end. The :where()s keep each rule at the specificity
    of the one it adjusts, so any component's own padding still wins. Not .nav-button or
    .nav-action, which come earlier and size their own. */
 :is(button, .button):where(:not(.nav-button, .nav-action)):where(:has(> svg:first-child)) {
@@ -419,12 +437,9 @@ button svg {
   padding: 0 12px 0 16px;
 }
 
-:is(.primary, .tonal):where(:has(> svg:first-child)) {
-  padding: 0 24px 0 16px;
-}
-
+:is(.primary, .tonal):where(:has(> svg:first-child)),
 :is(.primary, .tonal).icon-end {
-  padding: 0 16px 0 24px;
+  padding: 0 16px;
 }
 
 /* Every button reaches 48dp to a finger: --hit-outset grows a 40dp one by 4px each side on a
@@ -441,8 +456,11 @@ button svg {
   inset: var(--hit-outset);
 }
 
+/* Medium (56dp): round at 28dp, 12dp pressed. */
 .large {
+  --button-pressed-shape: var(--shape-medium);
   min-height: 56px;
+  border-radius: var(--button-shape, 28px);
   font: var(--title-medium);
 }
 
@@ -608,6 +626,85 @@ button svg {
   height: 18px;
 }
 
+/* ---------- Connected button group ---------- */
+
+/* M3 Expressive's replacement for the segmented button above, which it no longer recommends:
+   toggle buttons 2dp apart, the ends round and the inner corners 8dp. The chosen one turns
+   secondary and fully round; a press squares the inner corners off to 4dp. Tonal, so it shows on
+   a surface and on a list row alike. One line, never wrapping; in a block it fills the width.
+   Links (aria-current on the chosen one), radio buttons (role="radio", aria-checked) or toggle
+   buttons (aria-pressed):
+   <nav class="connected" aria-label="Range"><a aria-current="true">7 days</a><a>28 days</a></nav> */
+.connected {
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+}
+
+.connected > * {
+  --inner: var(--shape-small);
+  position: relative;
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 48px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--inner);
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+  font: var(--label-large);
+  letter-spacing: var(--label-large-tracking);
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    --state var(--duration-short) linear,
+    background-color var(--duration-short) var(--ease-standard),
+    color var(--duration-short) var(--ease-standard),
+    border-radius var(--spring-fast-duration) var(--spring-fast);
+}
+
+.connected > :first-child {
+  border-radius: 20px var(--inner) var(--inner) 20px;
+}
+
+.connected > :last-child {
+  border-radius: var(--inner) 20px 20px var(--inner);
+}
+
+.connected > :only-child {
+  border-radius: 20px;
+}
+
+.connected > :is([aria-current], [aria-checked='true'], [aria-pressed='true']) {
+  --inner: 20px;
+  background-color: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.connected > :active:not(:disabled) {
+  --inner: var(--shape-extra-small);
+}
+
+.connected > :disabled {
+  background-color: color-mix(in srgb, var(--on-surface) 12%, transparent);
+  color: color-mix(in srgb, var(--on-surface) 38%, transparent);
+}
+
+/* 48dp to a finger, up and down only: sideways, the next button is 2dp away. */
+.connected > ::after {
+  content: '';
+  position: absolute;
+  inset: var(--hit-outset) 0;
+}
+
+.connected svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* ---------- Colour swatches ---------- */
 
 /* Radio buttons, each a circle split into --swatch-1/2/3 (see accentSwatch in ui/palette). */
@@ -703,10 +800,10 @@ button svg {
   box-shadow: var(--elevation-3);
 }
 
-/* 16px above whatever sits below: the screen edge or the 80px tab bar. */
+/* 16px above whatever sits below: the screen edge or the tab bar. */
 
 .shell-tabbed .snackbar {
-  bottom: calc(96px + env(safe-area-inset-bottom));
+  bottom: calc(var(--tabbar-height) + 16px + env(safe-area-inset-bottom));
 }
 
 /* A long word (a link) wraps rather than pushing the action off the screen. */
@@ -1248,6 +1345,126 @@ details[open] > .disclosure-pill {
   }
 }
 
+/* ---------- Loading indicator ---------- */
+
+/* M3 Expressive's indicator for a short wait, 200ms to 5s (longer: a progress indicator): a
+   shape that morphs through seven Material shapes as it turns. 48dp, with the shape 38dp of
+   that; set width and height for another size, 24 to 240dp. Centre it where the content will
+   appear: <span class="loading-indicator" role="progressbar" aria-label="Loading"></span>.
+   .contained puts it on a primary-container circle, for over other content; .page centres it in
+   a page that is loading its data. */
+.loading-indicator {
+  display: inline-block;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--shape-full);
+  color: var(--primary);
+  vertical-align: middle;
+  animation: loading-indicator-spin 4666ms linear infinite;
+}
+
+.loading-indicator::before {
+  content: '';
+  display: block;
+  margin: 10.4167%;
+  aspect-ratio: 1;
+  background: currentColor;
+  clip-path: var(--loading-indicator-shape);
+  /* A new shape every 650ms (seven of them), each a quarter turn on a bouncy spring. */
+  animation:
+    loading-indicator-morph 4550ms var(--loading-indicator-morph) infinite,
+    loading-indicator-turn 2600ms var(--loading-indicator-turn) infinite;
+}
+
+.loading-indicator.contained {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.loading-indicator.page {
+  display: block;
+  margin: max(48px, 50dvh - var(--navbar-height) - 96px) auto 0;
+}
+
+@keyframes loading-indicator-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loading-indicator-turn {
+  25% {
+    rotate: 90deg;
+  }
+
+  50% {
+    rotate: 180deg;
+  }
+
+  75% {
+    rotate: 270deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* generated by scripts/loadingIndicator.ts: start */
+:root {
+  --loading-indicator-morph: linear(0, 0.054, 0.185, 0.352, 0.527, 0.69, 0.827, 0.934, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  --loading-indicator-turn: linear(0, 0.054, 0.185, 0.352, 0.527, 0.69, 0.827, 0.934, 1.011, 1.06, 1.086, 1.095, 1.091, 1.079, 1.063, 1.047, 1.031, 1.018, 1.007, 1, 0.995, 0.992, 0.991, 0.991, 0.992, 0.994, 1);
+  --loading-indicator-shape: polygon(50% 14%, 53.2% 13.3%, 57.3% 8.7%, 62.6% 3.1%, 66.9% 3.6%, 68.3% 10.7%, 68.8% 17.5%, 70.7% 20.5%, 73.4% 22.1%, 78.7% 21.3%, 86.4% 19.5%, 90.8% 21.4%, 88.8% 27.6%, 84.8% 33.8%, 83.9% 37.7%, 85% 40.6%, 88.8% 43.2%, 96% 46%, 100% 50%, 96% 54%, 88.8% 56.8%, 85% 59.4%, 83.9% 62.3%, 84.8% 66.2%, 88.8% 72.4%, 90.8% 78.6%, 86.4% 80.5%, 78.7% 78.7%, 73.4% 77.9%, 70.7% 79.5%, 68.8% 82.5%, 68.3% 89.3%, 66.9% 96.4%, 62.6% 96.9%, 57.3% 91.3%, 53.2% 86.7%, 50% 86%, 46.8% 86.7%, 42.7% 91.3%, 37.4% 96.9%, 33.1% 96.4%, 31.7% 89.3%, 31.2% 82.5%, 29.3% 79.5%, 26.6% 77.9%, 21.3% 78.7%, 13.6% 80.5%, 9.2% 78.6%, 11.2% 72.4%, 15.2% 66.2%, 16.1% 62.3%, 15% 59.4%, 11.2% 56.8%, 4% 54%, 0% 50%, 4% 46%, 11.2% 43.2%, 15% 40.6%, 16.1% 37.7%, 15.2% 33.8%, 11.2% 27.6%, 9.2% 21.4%, 13.6% 19.5%, 21.3% 21.3%, 26.6% 22.1%, 29.3% 20.5%, 31.2% 17.5%, 31.7% 10.7%, 33.1% 3.6%, 37.4% 3.1%, 42.7% 8.7%, 46.8% 13.3%);
+}
+
+@keyframes loading-indicator-morph {
+  0% {
+    clip-path: polygon(50% 14%, 53.2% 13.3%, 57.3% 8.7%, 62.6% 3.1%, 66.9% 3.6%, 68.3% 10.7%, 68.8% 17.5%, 70.7% 20.5%, 73.4% 22.1%, 78.7% 21.3%, 86.4% 19.5%, 90.8% 21.4%, 88.8% 27.6%, 84.8% 33.8%, 83.9% 37.7%, 85% 40.6%, 88.8% 43.2%, 96% 46%, 100% 50%, 96% 54%, 88.8% 56.8%, 85% 59.4%, 83.9% 62.3%, 84.8% 66.2%, 88.8% 72.4%, 90.8% 78.6%, 86.4% 80.5%, 78.7% 78.7%, 73.4% 77.9%, 70.7% 79.5%, 68.8% 82.5%, 68.3% 89.3%, 66.9% 96.4%, 62.6% 96.9%, 57.3% 91.3%, 53.2% 86.7%, 50% 86%, 46.8% 86.7%, 42.7% 91.3%, 37.4% 96.9%, 33.1% 96.4%, 31.7% 89.3%, 31.2% 82.5%, 29.3% 79.5%, 26.6% 77.9%, 21.3% 78.7%, 13.6% 80.5%, 9.2% 78.6%, 11.2% 72.4%, 15.2% 66.2%, 16.1% 62.3%, 15% 59.4%, 11.2% 56.8%, 4% 54%, 0% 50%, 4% 46%, 11.2% 43.2%, 15% 40.6%, 16.1% 37.7%, 15.2% 33.8%, 11.2% 27.6%, 9.2% 21.4%, 13.6% 19.5%, 21.3% 21.3%, 26.6% 22.1%, 29.3% 20.5%, 31.2% 17.5%, 31.7% 10.7%, 33.1% 3.6%, 37.4% 3.1%, 42.7% 8.7%, 46.8% 13.3%);
+  }
+
+  14.29% {
+    clip-path: polygon(50% 3.5%, 54.3% 1.2%, 58.7% 0.8%, 62.7% 2.7%, 65.9% 6.3%, 68.6% 10.1%, 71.5% 12.8%, 75.3% 13.9%, 79.9% 14.4%, 84.6% 15.4%, 88.3% 17.9%, 90.1% 21.9%, 90.3% 26.8%, 89.9% 31.4%, 90.4% 35.3%, 92.5% 38.6%, 95.8% 41.9%, 98.8% 45.7%, 100% 50%, 98.8% 54.3%, 95.8% 58.1%, 92.5% 61.4%, 90.4% 64.7%, 89.9% 68.6%, 90.3% 73.2%, 90.1% 78.1%, 88.3% 82.1%, 84.6% 84.6%, 79.9% 85.6%, 75.3% 86.1%, 71.5% 87.2%, 68.6% 89.9%, 65.9% 93.7%, 62.7% 97.3%, 58.7% 99.2%, 54.3% 98.8%, 50% 96.5%, 46.2% 93.9%, 42.5% 92.3%, 38.6% 92.5%, 34.1% 93.7%, 29.3% 94.4%, 25% 93.3%, 21.9% 90.1%, 20.1% 85.6%, 18.9% 81.1%, 17.1% 77.6%, 13.9% 75.3%, 9.7% 73.3%, 5.6% 70.7%, 3% 67.1%, 2.7% 62.7%, 4.2% 58.1%, 6.1% 53.8%, 7% 50%, 6.1% 46.2%, 4.2% 41.9%, 2.7% 37.3%, 3% 32.9%, 5.6% 29.3%, 9.7% 26.8%, 13.9% 24.7%, 17.1% 22.4%, 18.9% 18.9%, 20.1% 14.4%, 21.9% 9.9%, 25% 6.7%, 29.3% 5.6%, 34.1% 6.3%, 38.6% 7.5%, 42.5% 7.7%, 46.2% 6.1%);
+  }
+
+  28.57% {
+    clip-path: polygon(50% 0%, 54.3% 0.9%, 58.2% 3.4%, 61.8% 6%, 65.1% 8.4%, 68.3% 10.7%, 71.4% 12.9%, 74.4% 15.1%, 77.4% 17.3%, 80.5% 19.5%, 83.6% 21.8%, 86.9% 24.2%, 90.3% 26.7%, 94.1% 29.4%, 96.9% 32.9%, 98.1% 37.1%, 97.5% 41.6%, 96.1% 46%, 94.7% 50%, 93.5% 53.8%, 92.3% 57.5%, 91.2% 61%, 90% 64.6%, 88.9% 68.1%, 87.7% 71.8%, 86.5% 75.5%, 85.2% 79.5%, 83.8% 83.8%, 81.9% 88%, 78.7% 90.9%, 74.5% 92.4%, 69.8% 92.6%, 65.5% 92.6%, 61.4% 92.6%, 57.5% 92.6%, 53.7% 92.6%, 50% 92.6%, 46.3% 92.6%, 42.5% 92.6%, 38.6% 92.6%, 34.5% 92.6%, 30.2% 92.6%, 25.5% 92.4%, 21.3% 90.9%, 18.1% 88%, 16.2% 83.8%, 14.8% 79.5%, 13.5% 75.5%, 12.3% 71.8%, 11.1% 68.1%, 10% 64.6%, 8.8% 61%, 7.7% 57.5%, 6.5% 53.8%, 5.3% 50%, 3.9% 46%, 2.5% 41.6%, 1.9% 37.1%, 3.1% 32.9%, 5.9% 29.4%, 9.7% 26.7%, 13.1% 24.2%, 16.4% 21.8%, 19.5% 19.5%, 22.6% 17.3%, 25.6% 15.1%, 28.6% 12.9%, 31.7% 10.7%, 34.9% 8.4%, 38.2% 6%, 41.8% 3.4%, 45.7% 0.9%);
+  }
+
+  42.86% {
+    clip-path: polygon(50% 10.2%, 53.6% 8.4%, 57.6% 7.1%, 61.7% 6.3%, 65.9% 6.2%, 70.2% 6.7%, 74.4% 7.8%, 78.4% 9.5%, 82% 11.8%, 85.4% 14.6%, 88.2% 18%, 90.5% 21.6%, 92.2% 25.6%, 93.3% 29.8%, 93.8% 34.1%, 93.7% 38.3%, 92.9% 42.4%, 91.6% 46.4%, 89.8% 50%, 87.5% 53.3%, 84.9% 56.1%, 82.3% 58.7%, 80.1% 60.9%, 78% 63%, 76% 65%, 74.1% 66.9%, 72.3% 68.7%, 70.5% 70.5%, 68.7% 72.3%, 66.9% 74.1%, 65% 76%, 63% 78%, 60.9% 80.1%, 58.7% 82.3%, 56.1% 84.9%, 53.3% 87.5%, 50% 89.8%, 46.4% 91.6%, 42.4% 92.9%, 38.3% 93.7%, 34.1% 93.8%, 29.8% 93.3%, 25.6% 92.2%, 21.6% 90.5%, 18% 88.2%, 14.6% 85.4%, 11.8% 82%, 9.5% 78.4%, 7.8% 74.4%, 6.7% 70.2%, 6.2% 65.9%, 6.3% 61.7%, 7.1% 57.6%, 8.4% 53.6%, 10.2% 50%, 12.5% 46.7%, 15.1% 43.9%, 17.7% 41.3%, 19.9% 39.1%, 22% 37%, 24% 35%, 25.9% 33.1%, 27.7% 31.3%, 29.5% 29.5%, 31.3% 27.7%, 33.1% 25.9%, 35% 24%, 37% 22%, 39.1% 19.9%, 41.3% 17.7%, 43.9% 15.1%, 46.7% 12.5%);
+  }
+
+  57.14% {
+    clip-path: polygon(50% 0%, 54.2% 1.9%, 57.8% 5.9%, 61% 8.9%, 64.4% 10.5%, 67.8% 11.9%, 71.3% 13.2%, 75.7% 13.3%, 81% 13%, 85.4% 14.6%, 87% 19%, 86.7% 24.3%, 86.8% 28.8%, 88.1% 32.2%, 89.5% 35.6%, 91.1% 39%, 94.1% 42.2%, 98.1% 45.8%, 100% 50%, 98.1% 54.2%, 94.1% 57.8%, 91.1% 61%, 89.5% 64.4%, 88.1% 67.8%, 86.8% 71.2%, 86.7% 75.7%, 87% 81%, 85.4% 85.4%, 81% 87%, 75.7% 86.7%, 71.3% 86.8%, 67.8% 88.1%, 64.4% 89.5%, 61% 91.1%, 57.8% 94.1%, 54.2% 98.1%, 50% 100%, 45.8% 98.1%, 42.2% 94.1%, 39% 91.1%, 35.6% 89.5%, 32.2% 88.1%, 28.7% 86.8%, 24.3% 86.7%, 19% 87%, 14.6% 85.4%, 13% 81%, 13.3% 75.7%, 13.2% 71.3%, 11.9% 67.8%, 10.5% 64.4%, 8.9% 61%, 5.9% 57.8%, 1.9% 54.2%, 0% 50%, 1.9% 45.8%, 5.9% 42.2%, 8.9% 39%, 10.5% 35.6%, 11.9% 32.2%, 13.2% 28.8%, 13.3% 24.3%, 13% 19%, 14.6% 14.6%, 19% 13%, 24.3% 13.3%, 28.8% 13.2%, 32.2% 11.9%, 35.6% 10.5%, 39% 8.9%, 42.2% 5.9%, 45.8% 1.9%);
+  }
+
+  71.43% {
+    clip-path: polygon(50% 0%, 54.3% 0.6%, 58.4% 2.3%, 62.1% 4.8%, 65.3% 8.1%, 67.9% 11.6%, 70.1% 15.1%, 72.1% 18.4%, 74% 21.4%, 76.2% 23.8%, 78.6% 26%, 81.6% 27.9%, 84.9% 29.9%, 88.4% 32.1%, 91.9% 34.7%, 95.2% 37.9%, 97.7% 41.6%, 99.4% 45.7%, 100% 50%, 99.4% 54.3%, 97.7% 58.4%, 95.2% 62.1%, 91.9% 65.3%, 88.4% 67.9%, 84.9% 70.1%, 81.6% 72.1%, 78.6% 74%, 76.2% 76.2%, 74% 78.6%, 72.1% 81.6%, 70.1% 84.9%, 67.9% 88.4%, 65.3% 91.9%, 62.1% 95.2%, 58.4% 97.7%, 54.3% 99.4%, 50% 100%, 45.7% 99.4%, 41.6% 97.7%, 37.9% 95.2%, 34.7% 91.9%, 32.1% 88.4%, 29.9% 84.9%, 27.9% 81.6%, 26% 78.6%, 23.8% 76.2%, 21.4% 74%, 18.4% 72.1%, 15.1% 70.1%, 11.6% 67.9%, 8.1% 65.3%, 4.8% 62.1%, 2.3% 58.4%, 0.6% 54.3%, 0% 50%, 0.6% 45.7%, 2.3% 41.6%, 4.8% 37.9%, 8.1% 34.7%, 11.6% 32.1%, 15.1% 29.9%, 18.4% 27.9%, 21.4% 26%, 23.8% 23.8%, 26% 21.4%, 27.9% 18.4%, 29.9% 15.1%, 32.1% 11.6%, 34.7% 8.1%, 37.9% 4.8%, 41.6% 2.3%, 45.7% 0.6%);
+  }
+
+  85.71% {
+    clip-path: polygon(50% 11.9%, 53.4% 10.6%, 57.2% 9.4%, 61.1% 8.6%, 65.3% 8.1%, 69.5% 8.1%, 73.9% 8.6%, 78.1% 9.9%, 82% 11.9%, 85.4% 14.6%, 88.1% 18%, 90.1% 21.9%, 91.4% 26.1%, 91.9% 30.5%, 91.9% 34.7%, 91.4% 38.9%, 90.6% 42.8%, 89.4% 46.6%, 88.1% 50%, 86.7% 53.2%, 85.1% 56.2%, 83.5% 59%, 81.8% 61.6%, 80.1% 64%, 78.3% 66.3%, 76.5% 68.5%, 74.6% 70.6%, 72.6% 72.6%, 70.6% 74.6%, 68.5% 76.5%, 66.3% 78.3%, 64% 80.1%, 61.6% 81.8%, 59% 83.5%, 56.2% 85.1%, 53.2% 86.7%, 50% 88.1%, 46.6% 89.4%, 42.8% 90.6%, 38.9% 91.4%, 34.7% 91.9%, 30.5% 91.9%, 26.1% 91.4%, 21.9% 90.1%, 18% 88.1%, 14.6% 85.4%, 11.9% 82%, 9.9% 78.1%, 8.6% 73.9%, 8.1% 69.5%, 8.1% 65.3%, 8.6% 61.1%, 9.4% 57.2%, 10.6% 53.4%, 11.9% 50%, 13.3% 46.8%, 14.9% 43.8%, 16.5% 41%, 18.2% 38.4%, 19.9% 36%, 21.7% 33.7%, 23.5% 31.5%, 25.4% 29.4%, 27.4% 27.4%, 29.4% 25.4%, 31.5% 23.5%, 33.7% 21.7%, 36% 19.9%, 38.4% 18.2%, 41% 16.5%, 43.8% 14.9%, 46.8% 13.3%);
+  }
+
+  100% {
+    clip-path: polygon(50% 14%, 53.2% 13.3%, 57.3% 8.7%, 62.6% 3.1%, 66.9% 3.6%, 68.3% 10.7%, 68.8% 17.5%, 70.7% 20.5%, 73.4% 22.1%, 78.7% 21.3%, 86.4% 19.5%, 90.8% 21.4%, 88.8% 27.6%, 84.8% 33.8%, 83.9% 37.7%, 85% 40.6%, 88.8% 43.2%, 96% 46%, 100% 50%, 96% 54%, 88.8% 56.8%, 85% 59.4%, 83.9% 62.3%, 84.8% 66.2%, 88.8% 72.4%, 90.8% 78.6%, 86.4% 80.5%, 78.7% 78.7%, 73.4% 77.9%, 70.7% 79.5%, 68.8% 82.5%, 68.3% 89.3%, 66.9% 96.4%, 62.6% 96.9%, 57.3% 91.3%, 53.2% 86.7%, 50% 86%, 46.8% 86.7%, 42.7% 91.3%, 37.4% 96.9%, 33.1% 96.4%, 31.7% 89.3%, 31.2% 82.5%, 29.3% 79.5%, 26.6% 77.9%, 21.3% 78.7%, 13.6% 80.5%, 9.2% 78.6%, 11.2% 72.4%, 15.2% 66.2%, 16.1% 62.3%, 15% 59.4%, 11.2% 56.8%, 4% 54%, 0% 50%, 4% 46%, 11.2% 43.2%, 15% 40.6%, 16.1% 37.7%, 15.2% 33.8%, 11.2% 27.6%, 9.2% 21.4%, 13.6% 19.5%, 21.3% 21.3%, 26.6% 22.1%, 29.3% 20.5%, 31.2% 17.5%, 31.7% 10.7%, 33.1% 3.6%, 37.4% 3.1%, 42.7% 8.7%, 46.8% 13.3%);
+  }
+}
+
+/* generated by scripts/loadingIndicator.ts: end */
+
+/* Reduced motion: no turning or morphing. The first shape fades in and out instead. */
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator {
+    animation: none;
+  }
+
+  .loading-indicator::before {
+    animation: busy-pulse 2s ease-in-out infinite;
+  }
+}
+
 /* Busy, without movement: for reduced motion. */
 @keyframes busy-pulse {
   50% {
@@ -1269,8 +1486,12 @@ details[open] > .disclosure-pill {
 
 /* ---------- Navigation bar ---------- */
 
+/* M3 Expressive's flexible nav bar on a phone: 64dp, the icon's 56x32dp indicator 6dp from the
+   top, the label 4dp under it. From 600px a collapsed nav rail (96dp, on the page's surface),
+   and from 1200px an expanded one, whose items hug their label. */
+
 .shell-tabbed .screen {
-  padding-bottom: calc(168px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--tabbar-height) + 88px + env(safe-area-inset-bottom));
 }
 
 .tabbar {
@@ -1289,9 +1510,10 @@ details[open] > .disclosure-pill {
   flex: 1;
   max-width: 168px;
   flex-direction: column;
+  justify-content: flex-start;
   gap: 4px;
-  min-height: 80px;
-  padding: 12px 0 16px;
+  min-height: var(--tabbar-height);
+  padding: 6px 0;
   border-radius: 0;
   background-image: none;
   color: var(--on-surface-variant);
@@ -1304,7 +1526,7 @@ details[open] > .disclosure-pill {
   isolation: isolate;
   display: grid;
   place-items: center;
-  width: 64px;
+  width: 56px;
   height: 32px;
   border-radius: var(--shape-full);
   background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
@@ -1347,7 +1569,7 @@ details[open] > .disclosure-pill {
 }
 
 .tab[aria-current='page'] {
-  color: var(--on-surface);
+  color: var(--secondary);
 }
 
 .tab[aria-current='page'] .tab-indicator {
@@ -1358,7 +1580,7 @@ details[open] > .disclosure-pill {
 
 @media (min-width: 600px) {
   .shell-tabbed {
-    padding-left: calc(80px + env(safe-area-inset-left));
+    padding-left: calc(96px + env(safe-area-inset-left));
   }
 
   .shell-tabbed .screen {
@@ -1368,26 +1590,24 @@ details[open] > .disclosure-pill {
   .tabbar {
     top: 0;
     right: auto;
-    width: calc(80px + env(safe-area-inset-left));
+    width: calc(96px + env(safe-area-inset-left));
     flex-direction: column;
     justify-content: flex-start;
-    gap: 12px;
-    padding: calc(var(--navbar-height) + 24px + env(safe-area-inset-top)) 0 0 env(safe-area-inset-left);
+    gap: 4px;
+    padding: calc(44px + env(safe-area-inset-top)) 0 0 env(safe-area-inset-left);
+    background: var(--surface);
   }
 
   .tab {
     flex: none;
     min-height: 56px;
     padding: 0;
-  }
-
-  .tab-indicator {
-    width: 56px;
+    justify-content: center;
   }
 
   /* The tab bar is a rail on the left, so nothing is below. */
   .shell-tabbed .snackbar {
-    left: calc(96px + env(safe-area-inset-left));
+    left: calc(112px + env(safe-area-inset-left));
     bottom: calc(16px + env(safe-area-inset-bottom));
   }
 }
@@ -1412,24 +1632,32 @@ details[open] > .disclosure-pill {
 
   .tabbar {
     width: calc(240px + env(safe-area-inset-left));
-    align-items: stretch;
-    gap: 0;
-    padding: calc(var(--navbar-height) + 40px + env(safe-area-inset-top)) 12px 0 calc(12px + env(safe-area-inset-left));
+    align-items: flex-start;
+    overflow: clip;
+    padding: calc(44px + env(safe-area-inset-top)) 20px 0 calc(20px + env(safe-area-inset-left));
   }
 
+  /* The indicator hugs the icon and label; the target still spans the rail (::after, clipped
+     at the rail's edge). */
   .tab {
     position: relative;
     isolation: isolate;
     max-width: none;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 12px;
+    gap: 8px;
     padding: 0 16px;
     border-radius: var(--shape-full);
     background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
     font: var(--label-large);
     letter-spacing: var(--label-large-tracking);
     transition: --state var(--duration-short) linear;
+  }
+
+  .tab::after {
+    content: '';
+    position: absolute;
+    inset: 0 -240px 0 -20px;
   }
 
   .tab-indicator {
