@@ -49,6 +49,7 @@
   --scrim: rgb(0 0 0 / 0.32);
 
   --font: 'Roboto Flex Variable', Roboto, system-ui, sans-serif;
+  --display-large: 400 3.5625rem/4rem var(--font);
   --headline-small: 400 1.5rem/2rem var(--font);
   --title-large: 400 1.375rem/1.75rem var(--font);
   --title-medium: 500 1rem/1.5rem var(--font);
@@ -59,6 +60,20 @@
   --label-large: 500 0.875rem/1.25rem var(--font);
   --label-medium: 500 0.75rem/1rem var(--font);
 
+  /* `font` can't carry letter-spacing, so each type role has a -tracking token too: set them
+     together, e.g. `font: var(--body-medium); letter-spacing: var(--body-medium-tracking);`. */
+  --display-large-tracking: -0.015625rem;
+  --headline-small-tracking: 0;
+  --title-large-tracking: 0;
+  --title-medium-tracking: 0.009375rem;
+  --title-small-tracking: 0.00625rem;
+  --body-large-tracking: 0.03125rem;
+  --body-medium-tracking: 0.015625rem;
+  --body-small-tracking: 0.025rem;
+  --label-large-tracking: 0.00625rem;
+  --label-medium-tracking: 0.03125rem;
+
+  --shape-extra-small: 4px;
   --shape-small: 8px;
   --shape-medium: 12px;
   --shape-large: 16px;
@@ -106,8 +121,9 @@
 
 * {
   box-sizing: border-box;
-  /* Pan only, like a native app: no pinch or double-tap zoom. Not inherited, so it's set on everything. */
-  touch-action: pan-x pan-y;
+  /* No double-tap zoom, like a native app, so a quick second tap is never a zoom. Pinch zoom
+     stays: blocking it fails WCAG 1.4.4. Not inherited, so it's set on everything. */
+  touch-action: manipulation;
 }
 
 /* The page never scrolls sideways; the wide review table scrolls inside its own container. `clip` keeps sticky. */
@@ -288,7 +304,8 @@ button,
   justify-content: center;
   gap: 8px;
   min-height: 40px;
-  padding: 0 24px;
+  /* A text button's 12dp; filled and tonal ones take 24dp (below). */
+  padding: 0 12px;
   border-radius: 999px;
   border: none;
   background-color: transparent;
@@ -380,16 +397,40 @@ button svg {
 }
 
 .primary,
-.tonal,
-.dialog-actions button,
-.snackbar-action {
+.tonal {
+  padding: 0 24px;
+}
+
+/* An icon beside the label: 16dp on the icon's side for a text button, and on the other side for
+   a filled or tonal one (M3). CSS can't see that the icon comes after the label, so a button
+   with a trailing icon says so with .icon-end. The :where()s keep each rule at the specificity
+   of the one it adjusts, so any component's own padding still wins. Not .nav-button or
+   .nav-action, which come earlier and size their own. */
+:is(button, .button):where(:not(.nav-button, .nav-action)):where(:has(> svg:first-child)) {
+  padding: 0 16px 0 12px;
+}
+
+:is(button, .button).icon-end:where(:not(.nav-button, .nav-action)) {
+  padding: 0 12px 0 16px;
+}
+
+:is(.primary, .tonal):where(:has(> svg:first-child)) {
+  padding: 0 24px 0 16px;
+}
+
+:is(.primary, .tonal).icon-end {
+  padding: 0 16px 0 24px;
+}
+
+/* Every button reaches 48dp to a finger: --hit-outset grows a 40dp one by 4px each side on a
+   touch screen. Zero specificity, so any component's own position wins. Tabs, menu items,
+   list rows and swatches are big enough already, and growing them would overlap their
+   neighbours; segmented buttons grow up and down only (below). */
+:where(button, .button):where(:not(.tab, .menu-item, .group-row, .swatch)) {
   position: relative;
 }
 
-.primary::after,
-.tonal::after,
-.dialog-actions button::after,
-.snackbar-action::after {
+:where(button, .button):where(:not(.tab, .menu-item, .group-row, .swatch))::after {
   content: '';
   position: absolute;
   inset: var(--hit-outset);
@@ -425,6 +466,7 @@ button svg {
   margin: 0 0 8px;
   padding: 0 4px;
   font: var(--title-small);
+  letter-spacing: var(--title-small-tracking);
   color: var(--primary);
 }
 
@@ -504,15 +546,17 @@ button svg {
 /* ---------- Segmented button ---------- */
 
 /* Links (aria-current on the chosen one) or radio buttons (role="radio", aria-checked). */
+/* The end segments round their own corners, so the group needn't clip: clipping would cut off
+   the segments' focus ring and their 48dp touch target. */
 .segmented {
   display: inline-flex;
   flex: none;
-  overflow: hidden;
   border: 1px solid var(--outline);
   border-radius: 999px;
 }
 
 .segmented > * {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -527,8 +571,25 @@ button svg {
   text-decoration: none;
 }
 
+.segmented > :first-child {
+  border-radius: 999px 0 0 999px;
+}
+
 .segmented > :last-child {
   border-right: 0;
+  border-radius: 0 999px 999px 0;
+}
+
+.segmented > :only-child {
+  border-radius: 999px;
+}
+
+/* Up and down only, so neighbouring segments don't overlap. On links too, which the button rule
+   above doesn't reach. */
+.segmented > ::after {
+  content: '';
+  position: absolute;
+  inset: var(--hit-outset) 0;
 }
 
 .segmented > [aria-current],
@@ -628,10 +689,12 @@ button svg {
   max-width: 560px;
   margin: 0 auto;
   padding: 4px 8px 4px 16px;
-  border-radius: var(--shape-small);
-  background: var(--surface-container-highest);
-  color: var(--on-surface);
+  /* The inverse of the page (M3): it stands out on any surface, in light and dark. */
+  border-radius: var(--shape-extra-small);
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
   font: var(--body-medium);
+  letter-spacing: var(--body-medium-tracking);
   box-shadow: var(--elevation-3);
 }
 
@@ -641,14 +704,18 @@ button svg {
   bottom: calc(96px + env(safe-area-inset-bottom));
 }
 
+/* A long word (a link) wraps rather than pushing the action off the screen. */
 .snackbar-text {
   flex: 1;
+  min-width: 0;
   padding: 10px 0;
+  overflow-wrap: anywhere;
 }
 
 .snackbar-action {
   flex: none;
   padding: 0 12px;
+  color: var(--inverse-primary);
 }
 
 .snackbar-enter-active,
@@ -908,6 +975,293 @@ button svg {
   font: 400 0.75rem/1rem ui-monospace, monospace;
 }
 
+/* A summary that opens a section, as a tonal pill with a chevron:
+   <details class="disclosure"><summary class="disclosure-pill">…<MdIcon class="chevron"></summary> */
+.disclosure-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 48px;
+  padding: 0 12px 0 16px;
+  border-radius: 999px;
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+  font: var(--label-large);
+  letter-spacing: var(--label-large-tracking);
+  list-style: none;
+  cursor: pointer;
+}
+
+.disclosure-pill svg {
+  width: 18px;
+  height: 18px;
+}
+
+details[open] > .disclosure-pill {
+  margin-bottom: 12px;
+}
+
+/* ---------- Small text button ---------- */
+
+/* 32dp tall, with a 48dp touch target on any screen: `<a class="button compact">See all</a>`. */
+.compact {
+  position: relative;
+  min-height: 32px;
+  padding: 0 12px;
+}
+
+.compact::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 48px);
+  height: 48px;
+  transform: translate(-50%, -50%);
+}
+
+/* ---------- Text field (filled) ---------- */
+
+/* <label class="field">Label <input></label>: the label sits inside the field, above the value. */
+.field {
+  --state: 0%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 56px;
+  padding: 8px 16px 7px;
+  border-bottom: 1px solid var(--on-surface-variant);
+  border-radius: var(--shape-extra-small) var(--shape-extra-small) 0 0;
+  background-color: var(--surface-container-highest);
+  background-image: linear-gradient(color-mix(in srgb, var(--on-surface) var(--state), transparent) 0 0);
+  font: var(--body-small);
+  letter-spacing: var(--body-small-tracking);
+  color: var(--on-surface-variant);
+  cursor: text;
+}
+
+@media (hover: hover) {
+  .field:hover {
+    --state: 8%;
+  }
+}
+
+.field:focus-within {
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.field :is(input, select, textarea) {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: var(--body-large);
+  letter-spacing: var(--body-large-tracking);
+  color: var(--on-surface);
+}
+
+.field textarea {
+  resize: none;
+}
+
+.field [aria-invalid='true'] {
+  color: var(--error);
+}
+
+.field:has([aria-invalid='true']) {
+  border-bottom-color: var(--error);
+  color: var(--error);
+}
+
+/* A field with supporting text under it: <div class="field-wrap"><label class="field">…</label>
+   <span class="field-support">…</span></div>. */
+.field-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.field-support {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 4px 16px 0;
+  font: var(--body-small);
+  letter-spacing: var(--body-small-tracking);
+  color: var(--on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dense (48dp), for rows of fields: a small label above the value, as .field has at 56dp. */
+.field.dense {
+  min-height: 48px;
+  padding: 5px 12px 4px;
+}
+
+.field.dense:focus-within {
+  padding-bottom: 3px;
+}
+
+.field.dense :is(input, select, textarea) {
+  min-height: 22px;
+  font: var(--body-medium);
+  letter-spacing: var(--body-medium-tracking);
+}
+
+/* The label floats (M3): <label class="field floating"><span class="field-label">Label</span>
+   <input placeholder=" "></label>. Empty and unfocused, the label sits where the text goes; it
+   moves up once the field has focus or a value. The input needs a placeholder (a space will do)
+   for :placeholder-shown, and a real placeholder only shows once the field has focus. A date
+   field always shows its format, so its label stays up. */
+.field.floating {
+  position: relative;
+  justify-content: flex-end;
+  padding-top: 24px;
+}
+
+.field-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  right: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  transition:
+    top var(--duration-short) var(--ease-standard),
+    font-size var(--duration-short) var(--ease-standard),
+    line-height var(--duration-short) var(--ease-standard);
+}
+
+.field.floating:not(:focus-within):has(:placeholder-shown):not(:has(:autofill)) .field-label {
+  top: 16px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  letter-spacing: var(--body-large-tracking);
+}
+
+.field.floating:not(:focus-within) ::placeholder {
+  color: transparent;
+}
+
+/* ---------- Checkbox ---------- */
+
+/* The 18dp box (native, in the primary colour) with a 40dp state layer in a 48dp target:
+   <label class="checkbox"><input type="checkbox"></label>. */
+.checkbox {
+  --state: 0%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--on-surface);
+  cursor: pointer;
+}
+
+.checkbox::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor var(--state), transparent);
+}
+
+.checkbox:has(:checked) {
+  color: var(--primary);
+}
+
+@media (hover: hover) {
+  .checkbox:hover {
+    --state: 8%;
+  }
+}
+
+.checkbox:active,
+.checkbox:has(:focus-visible) {
+  --state: 10%;
+}
+
+.checkbox:has(:disabled) {
+  --state: 0%;
+  cursor: default;
+}
+
+.checkbox input {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: inherit;
+}
+
+/* ---------- Loading bar ---------- */
+
+/* A page loading its data: an indeterminate linear progress bar at the top of the content. With
+   reduced motion it pulses in place instead of sweeping. */
+.loading-bar {
+  position: relative;
+  height: 4px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--secondary-container);
+}
+
+.loading-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  border-radius: 2px;
+  background: var(--primary);
+  animation: loading-bar 1.4s var(--ease-standard) infinite;
+}
+
+@keyframes loading-bar {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-bar::before {
+    width: 100%;
+    animation: busy-pulse 2s ease-in-out infinite;
+  }
+}
+
+/* Busy, without movement: for reduced motion. */
+@keyframes busy-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ---------- Utilities ---------- */
+
+/* Read by a screen reader, not shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ---------- Navigation bar ---------- */
 
 .shell-tabbed .screen {
@@ -937,6 +1291,7 @@ button svg {
   background-image: none;
   color: var(--on-surface-variant);
   font: var(--label-medium);
+  letter-spacing: var(--label-medium-tracking);
 }
 
 .tab-indicator {
@@ -1068,6 +1423,7 @@ button svg {
     border-radius: 28px;
     background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
     font: var(--label-large);
+    letter-spacing: var(--label-large-tracking);
     transition: --state var(--duration-short) linear;
   }
 
