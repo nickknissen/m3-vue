@@ -524,13 +524,23 @@ button svg {
   cursor: pointer;
 }
 
+/* M3 lists put the icon in the middle of a row of one or two lines, and at the top from three.
+   So the icon's box grows with the row up to 48dp (two lines of text, 44dp, fit in it), with the
+   40dp circle drawn in its middle; past 48dp the box stays at the top. On a `<span>` around the
+   icon or on the `<svg>` itself. A row made taller than its text (M3's 72dp two-line row) puts
+   it back in the middle with `align-self: center` on the icon. */
 .row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
   width: 40px;
-  height: 40px;
+  height: auto;
+  min-height: 40px;
+  max-height: 48px;
   flex: none;
   padding: 8px;
-  border-radius: var(--shape-full);
-  background: var(--tone);
+  background: radial-gradient(closest-side, var(--tone) calc(100% - 0.5px), transparent) center / 40px 40px no-repeat;
   color: var(--on-tone);
 }
 
