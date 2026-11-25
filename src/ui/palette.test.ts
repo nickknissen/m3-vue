@@ -1,6 +1,6 @@
 import { argbFromHex, Hct } from '@material/material-color-utilities';
 import { describe, expect, it } from 'vitest';
-import { ACCENTS, accentPalette, accentSwatch, paletteProperties, TOKEN_PROPERTIES } from './palette';
+import { ACCENTS, accentPalette, accentSwatch, harmonizedColors, paletteProperties, TOKEN_PROPERTIES } from './palette';
 
 const hue = (hex: string) => Hct.fromInt(argbFromHex(hex)).hue;
 const tone = (hex: string) => Hct.fromInt(argbFromHex(hex)).tone;
@@ -39,6 +39,30 @@ describe('paletteProperties', () => {
     const properties = Object.fromEntries(paletteProperties(palette));
     expect(Object.keys(properties)).toEqual(TOKEN_PROPERTIES);
     expect(properties['--on-primary']).toBe(`light-dark(${palette.light['on-primary']}, ${palette.dark['on-primary']})`);
+  });
+});
+
+describe('harmonizedColors', () => {
+  const COLORS = { '--c-hr': { light: '#c62828', dark: '#ff8a80' }, '--c-rem': { light: '#0f7d63', dark: '#3fd0a4' } };
+  const turn = (from: string, to: string) => Math.abs(((hue(to) - hue(from) + 540) % 360) - 180);
+
+  it('leaves the colours as they are for the default accent', () => {
+    expect(harmonizedColors('default', COLORS)).toEqual(COLORS);
+  });
+
+  it('turns each hue toward the seed by at most 15°, keeping its tone', () => {
+    const out = harmonizedColors('teal', COLORS);
+    expect(Object.keys(out)).toEqual(Object.keys(COLORS));
+    for (const [property, c] of Object.entries(COLORS)) {
+      for (const scheme of ['light', 'dark'] as const) {
+        const before = c[scheme];
+        const after = out[property]![scheme];
+        expect(turn(before, after)).toBeLessThanOrEqual(15.5);
+        expect(turn(after, '#00897b')).toBeLessThanOrEqual(turn(before, '#00897b'));
+        expect(tone(after)).toBeCloseTo(tone(before), 0);
+      }
+    }
+    expect(out['--c-hr']!.light).not.toBe(COLORS['--c-hr'].light);
   });
 });
 

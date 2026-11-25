@@ -1,6 +1,6 @@
 {
   "name": "m3-vue",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Material 3 styles, components and helpers shared by ErgScan and garmin-dashboard",
   "license": "MIT",
   "type": "module",

@@ -77,7 +77,10 @@
   --shape-small: 8px;
   --shape-medium: 12px;
   --shape-large: 16px;
+  --shape-large-increased: 20px;
   --shape-extra-large: 28px;
+  /* Fully rounded: a pill on a wide element, a circle on a square one. */
+  --shape-full: 9999px;
 
   --elevation-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
   --elevation-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
@@ -208,7 +211,7 @@ svg {
   width: 48px;
   min-height: 48px;
   padding: 0;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   color: var(--on-surface);
 }
 
@@ -306,7 +309,7 @@ button,
   min-height: 40px;
   /* A text button's 12dp; filled and tonal ones take 24dp (below). */
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: var(--shape-full);
   border: none;
   background-color: transparent;
   color: var(--primary);
@@ -453,12 +456,12 @@ button svg {
   flex-direction: column;
   gap: 2px;
   margin: 0 0 24px;
-  border-radius: 20px;
+  border-radius: var(--shape-large-increased);
   overflow: hidden;
 }
 
 .group > * {
-  border-radius: 4px;
+  border-radius: var(--shape-extra-small);
   background-color: var(--surface-container);
 }
 
@@ -506,7 +509,7 @@ button svg {
   height: 40px;
   flex: none;
   padding: 8px;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: var(--tone);
   color: var(--on-tone);
 }
@@ -552,7 +555,7 @@ button svg {
   display: inline-flex;
   flex: none;
   border: 1px solid var(--outline);
-  border-radius: 999px;
+  border-radius: var(--shape-full);
 }
 
 .segmented > * {
@@ -572,16 +575,16 @@ button svg {
 }
 
 .segmented > :first-child {
-  border-radius: 999px 0 0 999px;
+  border-radius: var(--shape-full) 0 0 var(--shape-full);
 }
 
 .segmented > :last-child {
   border-right: 0;
-  border-radius: 0 999px 999px 0;
+  border-radius: 0 var(--shape-full) var(--shape-full) 0;
 }
 
 .segmented > :only-child {
-  border-radius: 999px;
+  border-radius: var(--shape-full);
 }
 
 /* Up and down only, so neighbouring segments don't overlap. On links too, which the button rule
@@ -625,7 +628,7 @@ button svg {
   content: '';
   position: absolute;
   inset: 4px;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background:
     linear-gradient(var(--swatch-1) 50%, transparent 50%),
     linear-gradient(90deg, var(--swatch-2) 50%, var(--swatch-3) 50%);
@@ -643,7 +646,7 @@ button svg {
   width: 20px;
   height: 20px;
   padding: 2px;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: var(--surface);
 }
 
@@ -740,7 +743,7 @@ button svg {
   gap: 4px;
   padding: 0 4px 0 12px;
   border-bottom: 1px solid var(--on-surface-variant);
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--shape-extra-small) var(--shape-extra-small) 0 0;
   background-color: var(--surface-container-highest);
   color: var(--on-surface);
   font: var(--body-large);
@@ -984,7 +987,7 @@ button svg {
   width: fit-content;
   min-height: 48px;
   padding: 0 12px 0 16px;
-  border-radius: 999px;
+  border-radius: var(--shape-full);
   background-color: var(--secondary-container);
   color: var(--on-secondary-container);
   font: var(--label-large);
@@ -1161,7 +1164,7 @@ details[open] > .disclosure-pill {
   flex: none;
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   color: var(--on-surface);
   cursor: pointer;
 }
@@ -1170,7 +1173,7 @@ details[open] > .disclosure-pill {
   content: '';
   position: absolute;
   inset: 4px;
-  border-radius: 50%;
+  border-radius: var(--shape-full);
   background: color-mix(in srgb, currentColor var(--state), transparent);
 }
 
@@ -1212,7 +1215,7 @@ details[open] > .disclosure-pill {
   height: 4px;
   margin-bottom: 16px;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--shape-full);
   background: var(--secondary-container);
 }
 
@@ -1221,7 +1224,7 @@ details[open] > .disclosure-pill {
   position: absolute;
   inset: 0 auto 0 0;
   width: 40%;
-  border-radius: 2px;
+  border-radius: var(--shape-full);
   background: var(--primary);
   animation: loading-bar 1.4s var(--ease-standard) infinite;
 }
@@ -1301,7 +1304,7 @@ details[open] > .disclosure-pill {
   place-items: center;
   width: 64px;
   height: 32px;
-  border-radius: 16px;
+  border-radius: var(--shape-full);
   background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
   transition: --state var(--duration-short) linear;
 }
@@ -1420,7 +1423,7 @@ details[open] > .disclosure-pill {
     justify-content: flex-start;
     gap: 12px;
     padding: 0 16px;
-    border-radius: 28px;
+    border-radius: var(--shape-full);
     background-image: linear-gradient(color-mix(in srgb, currentColor var(--state), transparent) 0 0);
     font: var(--label-large);
     letter-spacing: var(--label-large-tracking);
@@ -1436,7 +1439,7 @@ details[open] > .disclosure-pill {
   }
 
   .tab-indicator::before {
-    border-radius: 28px;
+    border-radius: var(--shape-full);
   }
 
   .tab[aria-current='page'] {
@@ -1507,7 +1510,7 @@ details[open] > .disclosure-pill {
   position: relative;
   flex: 1;
   width: 16px;
-  border-radius: 8px;
+  border-radius: var(--shape-full);
   cursor: col-resize;
   touch-action: none;
 }
@@ -1519,7 +1522,7 @@ details[open] > .disclosure-pill {
   left: 50%;
   width: 4px;
   height: 48px;
-  border-radius: 2px;
+  border-radius: var(--shape-full);
   background: var(--outline-variant);
   transform: translate(-50%, -50%);
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { accentPalette } from './palette';
+import { accentPalette, harmonizedColors } from './palette';
 import { applyTheme, loadAccent, loadTheme, saveAccent, saveTheme } from './theme';
 
 const THEME_KEY = 'app.theme';
@@ -95,6 +95,17 @@ describe('applyTheme', () => {
     expect(properties.size).toBe(0);
     expect(dataset.theme).toBe('dark');
     expect(metas.map((m) => m.content)).toEqual(['#111318', '#111318']);
+  });
+
+  it("sets the app's own colours, harmonized with an accent and as given for the default", () => {
+    const { doc, properties } = fakeDocument();
+    const colors = { '--c-hr': { light: '#c62828', dark: '#ff8a80' } };
+    applyTheme(doc, 'system', 'teal', colors);
+    const c = harmonizedColors('teal', colors)['--c-hr']!;
+    expect(properties.get('--c-hr')).toBe(`light-dark(${c.light}, ${c.dark})`);
+    applyTheme(doc, 'system', 'default', colors);
+    expect(properties.get('--c-hr')).toBe('light-dark(#c62828, #ff8a80)');
+    expect(properties.size).toBe(1);
   });
 
   it('picks the scheme with a data attribute, and none for system', () => {

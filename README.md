@@ -116,6 +116,17 @@ try {
 }
 ```
 
+Colours of the app's own, outside the scheme's roles (chart series, kinds of sport), go in as a
+fourth argument, keyed by custom property. `applyTheme` sets them on the root, and with an
+accent turns each hue toward its seed (Material 3 harmonization: at most 15°, tone kept), so
+they sit with the accent's palette. Pass the same ones on every call, and keep them out of the
+stylesheet, so there's one source:
+
+```ts
+const COLORS = { '--c-hr': { light: '#c62828', dark: '#ff8a80' } };
+applyTheme(document, theme, accent, COLORS);
+```
+
 For the settings, `.segmented` with `role="radio"` buttons picks the theme, and `.swatches`
 with `.swatch` radio buttons the accent; give each swatch `accentSwatch(accent)` as
 `--swatch-1`, `--swatch-2` and `--swatch-3`. `handleRadioKeydown` (`m3-vue/ui/keyboardNav`)

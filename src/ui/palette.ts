@@ -1,4 +1,4 @@
-import { argbFromHex, DynamicScheme, Hct, hexFromArgb, SchemeTonalSpot } from '@material/material-color-utilities';
+import { argbFromHex, Blend, DynamicScheme, Hct, hexFromArgb, SchemeTonalSpot } from '@material/material-color-utilities';
 
 export type Accent = 'default' | 'teal' | 'green' | 'amber' | 'red' | 'purple';
 
@@ -78,6 +78,24 @@ export function paletteProperties(palette: Palette): [string, string][] {
 }
 
 export const TOKEN_PROPERTIES: readonly string[] = TOKENS.map((token) => `--${token}`);
+
+/** A colour of the app's own, outside the scheme's roles (a chart series, a kind of sport), for light and dark. */
+export interface CustomColor {
+  light: string;
+  dark: string;
+}
+
+/**
+ * The app's own colours, keyed by custom property (`'--c-sleep'`), with each one's hue turned
+ * toward the accent's seed: Material 3's harmonization, at most 15° and keeping tone and chroma,
+ * so contrast holds. The default accent's colours were chosen beside style.css's, so they stay.
+ */
+export function harmonizedColors(accent: Accent, colors: Readonly<Record<string, CustomColor>>): Record<string, CustomColor> {
+  if (accent === 'default') return { ...colors };
+  const seed = argbFromHex(SEEDS[accent]);
+  const harmonize = (hex: string) => hexFromArgb(Blend.harmonize(argbFromHex(hex), seed));
+  return Object.fromEntries(Object.entries(colors).map(([property, c]) => [property, { light: harmonize(c.light), dark: harmonize(c.dark) }]));
+}
 
 export function accentSwatch(accent: Accent): string[] {
   const palette = accentPalette(accent);
