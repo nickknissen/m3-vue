@@ -5,9 +5,10 @@ Material 3 styles, components and helpers for Vue 3, shared by
 and were copied into garmin-dashboard. This package replaces both copies.
 
 - `m3-vue/style.css`: tokens (light and dark, with a `-tracking` token per type role), the app
-  shell, screen transitions, buttons and state layers, grouped lists, segmented buttons, colour
-  swatches, banners, snackbar, dropdown menu, dialog, disclosure, small text button, filled text
-  field, checkbox, loading bar, navigation bar and rail, wider screens, print
+  shell, screen transitions, buttons and state layers, grouped lists, segmented buttons,
+  connected button group, colour swatches, banners, snackbar, dropdown menu, dialog, disclosure,
+  small text button, filled text field, checkbox, loading bar, loading indicator, navigation bar
+  and rail, wider screens, print
 - `m3-vue/components/MdIcon.vue`, `MdDialog.vue`, `MdMenu.vue`, `MdSelect.vue`, `MdListDetail.vue`, `MdSnackbar.vue`
 - `m3-vue/ui/confirm`, `menu`, `popoverMenu`, `keyboardNav`, `mediaQuery`, `ripple`, `listPane`, `snackbar`, `theme`, `palette`
 - `m3-vue/icons`: the icon registry `MdIcon` draws from
@@ -127,7 +128,7 @@ const COLORS = { '--c-hr': { light: '#c62828', dark: '#ff8a80' } };
 applyTheme(document, theme, accent, COLORS);
 ```
 
-For the settings, `.segmented` with `role="radio"` buttons picks the theme, and `.swatches`
+For the settings, `.connected` with `role="radio"` buttons picks the theme, and `.swatches`
 with `.swatch` radio buttons the accent; give each swatch `accentSwatch(accent)` as
 `--swatch-1`, `--swatch-2` and `--swatch-3`. `handleRadioKeydown` (`m3-vue/ui/keyboardNav`)
 moves between the options with the arrow keys.
@@ -145,7 +146,40 @@ label needs `.icon-end`, since CSS can't see the order:
 
 Every button reaches 48dp on a touch screen through an `::after` (`--hit-outset`), so a
 component that needs its button's `::after` for something else should override `inset`, or use
-`::before`. `.compact` is a 32dp text button with a 48dp target.
+`::before`. `.compact` is a 32dp text button with a 48dp target, and `.large` a 56dp one.
+
+Pressed, a button squares its corners off and springs back (M3 Expressive's shape morph). That
+works through the button's radius being `var(--button-shape, <half its height>)`, which a press
+sets; a component with its own `border-radius` doesn't morph. To give your own button the morph,
+round it the same way: `border-radius: var(--button-shape, 24px)`.
+
+### Connected button group
+
+M3 Expressive's replacement for the segmented button: pick one of a few options (or several,
+with `aria-pressed`). It keeps to one line, and in a block it fills the width.
+
+```html
+<nav class="connected" aria-label="Range">
+  <a class="tappable" href="?days=7" aria-current="true">7 days</a>
+  <a class="tappable" href="?days=28">28 days</a>
+</nav>
+```
+
+`.segmented` stays for whoever still uses it; Material no longer recommends it.
+
+### Loading indicator
+
+For a wait of 200ms to 5s: a shape morphing through seven Material shapes as it turns. Put it
+where the content will appear; `.page` centres it on a page loading its data, `.contained` puts
+it on a circle for over other content, and width and height size it (24 to 240dp, 48 by default).
+With reduced motion it stays still and fades in and out.
+
+```html
+<span class="loading-indicator page" role="progressbar" aria-label="Loading"></span>
+```
+
+Its shapes are generated: change them in `scripts/loadingIndicator.ts`, then
+`npm run loading-indicator` rewrites them in `style.css`.
 
 ### Text field
 
