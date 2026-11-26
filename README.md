@@ -16,11 +16,14 @@ and were copied into garmin-dashboard. This package replaces both copies.
 ## Using it
 
 It ships its source (`.vue`, `.ts`, `?raw` SVG imports), so the app's Vite build compiles it.
-Install a tag:
+Install it from npm, at an exact version:
 
 ```sh
-npm install github:nickknissen/m3-vue#v0.1.0
+npm install --save-exact m3-vue
 ```
+
+Not from GitHub (`github:nickknissen/m3-vue#v0.8.0`): Renovate can't update the lockfile for
+a git dependency, and `npm ci` then needs git, which slim Docker images don't have.
 
 In `vite.config.ts`, keep Vite from pre-bundling it, and let vitest compile it. Its colour
 library, `@material/material-color-utilities`, imports without file extensions, which Node
@@ -201,8 +204,11 @@ npm install
 npm run check    # type-check and test
 ```
 
-Release by tagging (`v0.2.0`, …) and moving each app to the new tag. A change to the styles
-shows in both apps, so look at both before tagging.
+To release, set the version in `package.json` (`npm version minor --no-git-tag-version`), merge
+it, then tag main with it and push the tag (`git tag v0.9.0 && git push origin v0.9.0`). The
+Publish workflow checks the tag matches `package.json`, runs `npm run check` and publishes to
+npm. Renovate then opens a PR in ErgScan and garmin-dashboard that moves to it. A change to the
+styles shows in both apps, so look at both before tagging.
 
 ## License
 
