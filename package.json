@@ -4,7 +4,10 @@
   "description": "Material 3 styles, components and helpers shared by ErgScan and garmin-dashboard",
   "license": "MIT",
   "type": "module",
-  "repository": "github:nickknissen/m3-vue",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nickknissen/m3-vue.git"
+  },
   "files": [
     "src",
     "!src/**/*.test.ts"
