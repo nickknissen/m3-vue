@@ -3,7 +3,7 @@
 # git dependency: Renovate's npm refuses to fetch git packages (EALLOWGIT).
 #
 # Trusted publishing: npm trusts this workflow, so there's no npm token in the repo's secrets.
-# Set it up once on npmjs.com → m3-vue → Settings → Trusted publisher: GitHub Actions,
+# Set it up once on npmjs.com → @nickknissen/m3-vue → Settings → Trusted publisher: GitHub Actions,
 # nickknissen/m3-vue, workflow publish.yml.
 name: Publish
 
