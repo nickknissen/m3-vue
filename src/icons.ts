@@ -32,7 +32,7 @@ type PackageIcons = typeof PACKAGE_ICONS;
  *
  *     export const ICONS = { add: icon(add), … };
  *     type AppIcons = typeof ICONS;
- *     declare module 'm3-vue/icons' {
+ *     declare module '@nickknissen/m3-vue/icons' {
  *       interface Icons extends AppIcons {}
  *     }
  *
