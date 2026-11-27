@@ -1,8 +1,78 @@
 # m3-vue
 
-Material 3 styles, components and helpers for Vue 3, shared by
-[ErgScan](https://github.com/nickknissen/ergscan) and garmin-dashboard. They started in ErgScan
-and were copied into garmin-dashboard. This package replaces both copies.
+Material 3 styles, components and helpers for Vue 3, shared by two separate apps:
+[ErgScan](https://github.com/nickknissen/ergscan) (reads a rowing machine's results screen) and
+garmin-dashboard (training data from Garmin, with a coach). Both should look and behave the same,
+so the look lives here once, and each app installs it from npm.
+
+## Why it exists
+
+The Material 3 design was built in ErgScan, as Vue components with tests. garmin-dashboard was
+then Jinja templates with plain JavaScript, and kept up with ErgScan by copying its CSS and
+behaviour by hand: four commits in a row did nothing but that, and it already had its own
+`confirmDialog()` and `snackbar()` next to ErgScan's `MdDialog` and snackbar.
+
+The two apps stay separate (their own repos, Docker images and deploys), so the choice was how to
+share the interface between them. In order:
+
+1. **garmin-dashboard moved to Vue 3** and copied ErgScan's styles, `Md*` components and `ui/*`
+   helpers in as they were, noting the ErgScan commit they came from. A library with only one
+   user would guess wrong about what it should expose, and a Vue library is no use to an app that
+   isn't Vue.
+2. **Once both apps used the same components, they moved here.** The copies were compared with
+   ErgScan's from the noted commit, and the differences were few: no translation call in
+   `MdDialog`, each app's own icons, and only the shared styles. ErgScan's `style.css` went from
+   2579 lines to 1565, keeping only its own rules, and its screens were pixel-identical before
+   and after.
+3. **Since then, a fix goes here rather than into one app.** Material 3 audits of
+   garmin-dashboard (touch targets, the snackbar, button padding, pinch zoom) and the
+   M3 Expressive pass (shape morph, connected button group, loading indicator) were made in
+   m3-vue, so ErgScan got them too. ErgScan's theme and accent colours came the same way, once
+   garmin-dashboard needed them.
+
+Ruled out along the way:
+
+- **Keep copying by hand:** every design change done twice, and the copies drift.
+- **A CSS-only package:** both apps could use it without a migration, but the behaviour (dialogs,
+  menus, ripple, the nav rail) is Vue and TypeScript, so it would share only half.
+- **One repo or one app:** the apps stay separate. Pulling ErgScan's rowing data into
+  garmin-dashboard is a separate piece of work through ErgScan's sync client, and doesn't belong
+  in this package: a style change shouldn't be tied to a change in the data format.
+- **`file:../m3-vue`:** each app builds its own Docker image, which can't see a sibling folder.
+
+## How it's built, and why
+
+- **It ships its source** (`.vue`, `.ts`, `?raw` SVG imports), with no build step of its own.
+  Both apps compile with Vite anyway, so they compile this too (see the Vite config below).
+- **It's on npm, at an exact version.** It was first a tagged `github:` dependency. Renovate's
+  npm refuses to fetch git dependencies (`EALLOWGIT`), so its bumps changed `package.json` but
+  not the lockfile, and `npm ci` then needed git, which the apps' `node:24-slim` images don't
+  have. Deploys of both apps failed that way. From npm, Renovate updates both files together.
+- **Renovate moves the apps.** Each app has a `renovate.json` that watches only this package, so
+  a release becomes one PR per app, and each app's CI builds its Docker image the way the deploy
+  does, so a broken bump fails the PR, not the deploy.
+- **No i18n.** ErgScan translates, garmin-dashboard doesn't. Text a component shows comes in as
+  a prop with an English default (`MdDialog`'s `cancel-label`).
+- **The app names its storage keys.** Theme, accent and list width are saved under keys the app
+  passes in (`ergscan.theme`, `theme`), so each app keeps its existing saved settings.
+- **Icons are registered by the app.** The package has only the few its own components draw.
+  Each app registers the rest at startup and declares their names, so a wrong name still fails
+  the type check.
+- **Colours of the app's own go through `applyTheme`**, not the stylesheet, so chart and zone
+  colours follow the accent (harmonized) and have one source.
+
+## What goes here, and what stays in the app
+
+Here: anything that is plain Material 3 and that either app could use. That's tokens, the shell,
+buttons, lists, dialogs, menus, fields, progress, the snackbar, theme and colour, and helpers like
+ripple and keyboard navigation. If an app has to override one of these rules to make it right,
+the fix belongs here.
+
+In the app: its own data and zone colours, the labels and where its settings rows sit, anything
+tied to a page (the coach's composer height) or a library the package doesn't use (Chart.js
+keyboard navigation), and translations.
+
+## What's in it
 
 - `@nickknissen/m3-vue/style.css`: tokens (light and dark, with a `-tracking` token per type role), the app
   shell, screen transitions, buttons and state layers, grouped lists, segmented buttons,
@@ -22,9 +92,8 @@ Install it from npm, at an exact version:
 npm install --save-exact @nickknissen/m3-vue
 ```
 
-Not from GitHub (`github:nickknissen/m3-vue#v0.8.0`): Renovate can't update the lockfile for
-a git dependency, and `npm ci` then needs git, which slim Docker images don't have. The
-unscoped `m3-vue` on npm is the old name, only ever at 0.8.0.
+Not from GitHub (`github:nickknissen/m3-vue#v0.8.0`), for the reason above. The unscoped
+`m3-vue` on npm is the old name, only ever at 0.8.0.
 
 In `vite.config.ts`, keep Vite from pre-bundling it, and let vitest compile it. Its colour
 library, `@material/material-color-utilities`, imports without file extensions, which Node
